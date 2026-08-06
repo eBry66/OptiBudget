@@ -34,3 +34,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-06
     based_on: []
     note: "initial"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-06
+    based_on: [DOC-003@f6d234ed86e9ff27f67cf02f6aee27383065fc74]
+    note: "initial"
