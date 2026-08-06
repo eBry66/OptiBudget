@@ -1,0 +1,28 @@
+# dev-template machinery manifest.
+# Every path listed here is OVERWRITTEN by scripts/template-sync.mjs without
+# asking. A file belongs here only if it is byte-identical in every project and
+# contains no project-specific noun.
+#
+# Explicit paths only. Wildcards are rejected by the sync script: one day a
+# wildcard sweeps up a content file and silently destroys work.
+#
+# Anything not listed here is CONTENT and is never touched by a sync:
+#   product/**  engineering/**  src/**  tests/**  supabase/**
+#   orchestration/tasks/**  orchestration/approvals.yaml  orchestration/PROJECT_RULES.md
+#   orchestration/bootstrap.yaml  project.state.yaml  package.json  .env.example
+#   .gitignore  README.md
+
+template_version: 1.2.0
+
+machinery:
+  - AGENTS.md
+  - CLAUDE.md
+  - .gitattributes
+  - .claude/settings.json
+  - .codex/config.toml
+  - scripts/next.mjs
+  - scripts/template-sync.mjs
+  - orchestration/BOOTSTRAP.md
+  - orchestration/REVIEW_BRIEF.md
+  - orchestration/HITL_GUIDE.md
+  - .github/PULL_REQUEST_TEMPLATE.md

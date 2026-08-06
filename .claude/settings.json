@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Edit(./orchestration/bootstrap.yaml)",
+      "Edit(./orchestration/approvals.yaml)",
+      "Edit(./project.state.yaml)",
+      "Edit(./template.lock)",
+      "Edit(./template.manifest.yaml)",
+      "Edit(./scripts/**)"
+    ]
+  }
+}
