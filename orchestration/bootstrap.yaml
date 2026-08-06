@@ -1,0 +1,98 @@
+version: 1
+documents:
+  - id: DOC-001
+    path: .gitattributes
+    owner: hitl
+    depends_on: []
+  - id: DOC-002
+    path: .gitignore
+    owner: hitl
+    depends_on: []
+  - id: DOC-003
+    path: orchestration/bootstrap.yaml
+    owner: hitl
+    depends_on: []
+  - id: DOC-004
+    path: AGENTS.md
+    owner: hitl
+    depends_on: [DOC-003]
+  - id: DOC-005
+    path: CLAUDE.md
+    owner: hitl
+    depends_on: [DOC-004]
+  - id: DOC-006
+    path: .codex/config.toml
+    owner: hitl
+    depends_on: [DOC-004]
+  - id: DOC-007
+    path: .claude/settings.json
+    owner: hitl
+    depends_on: [DOC-004]
+  - id: DOC-008
+    path: product/PRODUCT.md
+    owner: hitl
+    depends_on: [DOC-004]
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    owner: hitl
+    depends_on: [DOC-008]
+  - id: DOC-010
+    path: product/DECISIONS.md
+    owner: hitl
+    depends_on: [DOC-008]
+  - id: DOC-011
+    path: product/REQUIREMENTS.md
+    owner: hitl
+    depends_on: [DOC-009]
+  - id: DOC-012
+    path: product/SCOPE.md
+    owner: hitl
+    depends_on: [DOC-011]
+  - id: DOC-013
+    path: product/ACCEPTANCE.md
+    owner: hitl
+    depends_on: [DOC-012]
+  - id: DOC-014
+    path: product/ASSETS.md
+    owner: hitl
+    depends_on: [DOC-012]
+  - id: DOC-015
+    path: engineering/ARCHITECTURE.md
+    owner: agent
+    depends_on: [DOC-012]
+  - id: DOC-016
+    path: engineering/THREAT_MODEL.md
+    owner: agent
+    depends_on: [DOC-015]
+  - id: DOC-017
+    path: engineering/TESTING.md
+    owner: hitl
+    depends_on: [DOC-013]
+  - id: DOC-018
+    path: package.json
+    owner: agent
+    depends_on: [DOC-015]
+  - id: DOC-019
+    path: .env.example
+    owner: agent
+    depends_on: [DOC-016]
+  - id: DOC-020
+    path: engineering/CHECK_MAP.md
+    owner: hitl
+    depends_on: [DOC-017, DOC-018]
+  - id: DOC-021
+    path: orchestration/REVIEW_BRIEF.md
+    owner: hitl
+    depends_on: [DOC-013, DOC-016]
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    owner: hitl
+    depends_on: [DOC-004]
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    owner: hitl
+    depends_on: [DOC-004, DOC-008]
+  - id: DOC-024
+    path: project.state.yaml
+    owner: hitl
+    depends_on: [DOC-013, DOC-014, DOC-019, DOC-020, DOC-021, DOC-022, DOC-023]
