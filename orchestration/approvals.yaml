@@ -4,3 +4,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-06
     based_on: []
     note: "initial"
+  - id: DOC-002
+    path: .gitignore
+    commit: f6d234ed86e9ff27f67cf02f6aee27383065fc74
+    approved_at: 2026-08-06
+    based_on: []
+    note: "initial"
