@@ -86,7 +86,7 @@ claude doctor
 
 If you see `'irm' is not recognized`, you are in CMD, not PowerShell. Your prompt shows `PS C:\` in PowerShell.
 
-Then, from inside `C:\OneDrive\Dev\OptiBudget`, run `claude` and follow the browser login prompt. Source: https://code.claude.com/docs/en/setup
+Then, from inside `C:\Dev\OptiBudget`, run `claude` and follow the browser login prompt. Source: https://code.claude.com/docs/en/setup
 
 The VS Code extension is optional. The CLI is the product; the extension is an interface on top of it. Install the extension only after the CLI works.
 
@@ -119,9 +119,19 @@ If the vendor returns `OB-7Q4`, its configuration loaded. If it does not, its co
 
 ## 3. Repository Creation
 
+Run these two lines first, alone, and read the output before doing anything else:
+
 ```powershell
-mkdir C:\OneDrive\Dev\OptiBudget
-cd C:\OneDrive\Dev\OptiBudget
+mkdir C:\Dev\OptiBudget
+cd C:\Dev\OptiBudget
+pwd
+```
+
+`pwd` must print `C:\Dev\OptiBudget`. If it prints anything else — most often `C:\Users\<you>` — stop. Do not run the next block. Every command below acts on whatever folder you are standing in, and PowerShell will carry them out in your home directory without complaint. See section 11.1 for how to undo that.
+
+Only once `pwd` is correct:
+
+```powershell
 git init
 mkdir orchestration, orchestration\tasks, product, engineering, engineering\adr, scripts, tests, src, supabase, supabase\migrations, .codex, .claude, .github, .github\workflows
 code .
@@ -419,7 +429,7 @@ approvals:
 
 Provided as a separate file alongside this guide. Copy it to `scripts/next.mjs`. Do not edit it. It has been executed against a real Git repository and verified for: available/blocked/approved/modified/stale states, the prerequisite-drift cascade, refusal to approve an uncommitted file, and non-zero exit on any violation.
 
-Commands, all run from `C:\OneDrive\Dev\OptiBudget`:
+Commands, all run from `C:\Dev\OptiBudget`:
 
 ```powershell
 node scripts/next.mjs status          # full board
@@ -531,11 +541,15 @@ account balance shown on the dashboard decreases by exactly 42.50.
 
 Test: if you cannot confirm an AC by operating the app, the AC is badly written. Fix the AC, not the code [M]. Each AC maps to exactly one REQ id.
 
-### 6.7 product/ASSETS.md (DOC-014)
+### 6.7 product/UX.md (DOC-025)
+
+Which screens exist, what appears on each, and how you move between them. Not a design specification and not a style guide — a screen inventory a vendor can build against without guessing. Section 16.3 covers how to arrive at it.
+
+### 6.8 product/ASSETS.md (DOC-014)
 
 Logos, fonts, colours, icons, and their licences. Short.
 
-### 6.8 engineering/TESTING.md (DOC-017)
+### 6.9 engineering/TESTING.md (DOC-017)
 
 Part A, the naming contract. Exactly how a test declares which AC it covers, as a literal string an automated check can match:
 
@@ -547,11 +561,11 @@ A pull request fails if any AC id in ACCEPTANCE.md has no matching test.
 
 Without this literal string, `check-coverage.mjs` has no specification and cannot be written [M].
 
-### 6.9 engineering/CHECK_MAP.md (DOC-020)
+### 6.10 engineering/CHECK_MAP.md (DOC-020)
 
 Part B. A two-column mapping from each name in `required_checks` to the exact npm script that runs it. Written after `package.json` exists, which is why it depends on DOC-018.
 
-### 6.10 orchestration/REVIEW_BRIEF.md (DOC-021)
+### 6.11 orchestration/REVIEW_BRIEF.md (DOC-021)
 
 The prompt you paste to the reviewing vendor. It must name the diff to review, the documents to review it against, and require output as a list of violations with file and line — not a summary, not praise.
 
@@ -638,10 +652,11 @@ Task-001 is the only task where the enforcement machinery does not yet protect y
 - Push rejected, "protected branch" — you enabled branch protection early. See section 8.1.
 - First push opens a browser window — that is Git Credential Manager. Sign in to GitHub and it will not ask again.
 - Line-ending warnings on commit — expected. `.gitattributes` normalises to LF. Ignore them.
+- I ran section 3 in the wrong folder, usually `C:\Users\<you>` — `git init` created a repository over your entire home directory and the project folders were made there. Fix it in this order. First, close the VS Code window that `code .` opened. Then, from that folder, delete the repository: `Remove-Item -Recurse -Force .git`. Then list what is inside the stray folders before deleting anything: `@("orchestration","product","engineering","scripts","tests","src","supabase",".github") | ForEach-Object { Get-ChildItem $_ -Recurse -File -ErrorAction SilentlyContinue }`. If that prints nothing, they are empty and safe to remove: `@("orchestration","product","engineering","scripts","tests","src","supabase",".github") | ForEach-Object { Remove-Item $_ -Recurse -Force -ErrorAction SilentlyContinue }`. Never delete `.codex` or `.claude` from your home directory. Those are the vendors' own configuration folders, they existed before you started, and `mkdir` refusing to create them is the reason they survived. Deleting them costs you your Claude Code login and settings.
 
 ### 11.2 next.mjs
 
-- `missing file: orchestration/bootstrap.yaml` — you are not in `C:\OneDrive\Dev\OptiBudget`. Run `cd C:\OneDrive\Dev\OptiBudget`.
+- `missing file: orchestration/bootstrap.yaml` — you are not in `C:\Dev\OptiBudget`. Run `cd C:\Dev\OptiBudget`.
 - `no documents parsed` — the YAML shape drifted. Every document is a list item starting with `- id:`, indented two spaces, with the other three keys indented four. Arrays inline in square brackets.
 - `has uncommitted changes` — commit the file before approving. This guard is deliberate.
 - `is not in git history` — you created the file but never committed it.
@@ -803,6 +818,58 @@ Do not use the web editor for `approvals.yaml`, `bootstrap.yaml`, `project.state
 
 From gate 1 onward your loop is: read the checklist, use the app, confirm the check is green, write one accept or reject line. All four are doable from an iPad. The build loop needs a PC; the decision loop does not.
 
+## 16. The Two Phases: Product and Engineering
+
+### 16.1 The split
+
+Every document in the graph belongs to one of two phases, and the split is the reason the folder names are what they are.
+
+Product, in `product/`, answers why and what. Owned by the HITL. Written in plain language, in the vocabulary the glossary defines, containing no technology and no implementation. A person who has never seen the codebase should be able to read `product/` and know what the application is for and how they would recognise it working.
+
+Engineering, in `engineering/` and in code, answers how. Drafted by a coding vendor, reviewed by a different one, approved by the HITL. It may not introduce a requirement. If an engineering document needs something the product documents do not say, that is a defect in the product phase and the correct response is to stop and go back, not to invent it.
+
+The boundary is enforced by the dependency graph, not by good intentions: `engineering/ARCHITECTURE.md` depends on `product/SCOPE.md`, so it cannot be written until scope is approved.
+
+### 16.2 What the product phase delivers
+
+Read as a sequence, these documents narrow from purpose to observable behaviour.
+
+`PRODUCT.md` states why the application exists and what it is not. `GLOSSARY.md` fixes one meaning per domain noun. `REQUIREMENTS.md` states what the system must do. `SCOPE.md` states which of those requirements are in this version. `ACCEPTANCE.md` states how you will recognise each one working, by hand. `UX.md` states which screens exist and how you move between them. `ASSETS.md` states what it is built from visually. `DECISIONS.md` records what was chosen and what that ruled out.
+
+Nothing in that list mentions a framework, a database, or a language. If yours does, it has drifted into the engineering phase.
+
+### 16.3 Prototyping
+
+Optional. It is a way of discovering what you want, not a stage anything depends on. A HITL who already knows the product can skip it entirely and lose nothing.
+
+Prototyping happens in chat, on the iPad or anywhere else, and never in the repository. You describe a screen, the assistant builds something you can click, you use it and discover what is wrong or missing. Two or three rounds is usually enough.
+
+Two routes into the loop, and they suit different people. If you think visually, sketch on paper, photograph the sketch, and use it as the input. If you do not, start from a prototype and give written feedback or an annotated screenshot of it. Both routes converge on the same place.
+
+What the loop actually produces is not the prototype. It is a shorter list of things you now know: requirements you had not thought of, acceptance criteria you can phrase precisely because you have seen the alternative, and a screen inventory you can defend. Those go into `REQUIREMENTS.md`, `ACCEPTANCE.md`, and `UX.md` as text.
+
+The prototype itself is thrown away. So are the sketches and the annotated screenshots — they are working material, they live outside the repository, and they are not documents. An image committed to the repository is read by an agent as a specification it must satisfy literally, without any way of knowing which parts you meant and which were your pen wandering. Ambiguous input to a stateless agent is worse than no input.
+
+### 16.4 The rule that makes this safe
+
+Prototype code is never merged into OptiBudget. Not adapted, not used as a starting point, not "cleaned up first".
+
+The reason is not code quality. It is that nobody rewrites something that already works, so a prototype that reaches the repository quietly becomes the architecture — chosen in an afternoon, by nobody, and never reviewed. Everything in this system exists to stop unreviewed work becoming permanent.
+
+Record this once in `DECISIONS.md` so it is a decision you made rather than a habit you have.
+
+### 16.5 When to prototype
+
+Before `REQUIREMENTS.md` if you are unsure what the product is. Between `SCOPE.md` and `UX.md` if you know what it does but not what it looks like. It is not tied to a DOC id, because it feeds several: DOC-011, DOC-013, and DOC-025.
+
+It must be finished before DOC-015. From `ARCHITECTURE.md` onward the vendors are working from your documents, and a screen inventory that arrives after the architecture is a change request rather than an input.
+
+### 16.6 The handover
+
+The engineering phase begins when `SCOPE.md` is approved. From that moment the product documents are the specification, and the only thing a vendor may do with a question is stop and ask.
+
+That is the whole contract. The product phase is where you are irreplaceable and where the system cannot check your work. The engineering phase is where the vendors are fast and the machinery can check theirs.
+
 ## Appendix A. Vocabulary and Core Mechanics
 
 Read this before section 2 if you have never used Git. Every term below appears in this guide or in an error message you will meet. Definitions are deliberately short; the goal is recognition, not expertise.
@@ -821,7 +888,7 @@ Nothing is safe until it reaches place 3. Files in place 1 can be lost by a bad 
 
 A commit is a saved snapshot of the whole project at one moment, with a message saying what changed. It is the unit everything else in this project is built on: approvals record a commit, agents read commits, CI runs on commits.
 
-From `C:\OneDrive\Dev\OptiBudget` in PowerShell:
+From `C:\Dev\OptiBudget` in PowerShell:
 
 ```powershell
 git status          # what changed, and what is staged
@@ -837,7 +904,7 @@ Nothing leaves your PC until you push (A.4). Committing is private; pushing is p
 
 ### A.3 Git vocabulary
 
-- repository (repo) — the project folder plus its complete history. `C:\OneDrive\Dev\OptiBudget` is one.
+- repository (repo) — the project folder plus its complete history. `C:\Dev\OptiBudget` is one.
 - git init — turns a plain folder into a repository. Done once, in section 3.
 - staged / unstaged — a change that will, or will not, be included in your next commit.
 - clean / dirty — a working directory with no uncommitted changes is clean. `next.mjs approve` refuses to run on a dirty file.
