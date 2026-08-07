@@ -70,3 +70,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-07
     based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
     note: "initial"
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-07
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "initial"
