@@ -99,4 +99,4 @@ documents:
     id:	DOC-025
     path: product/UX.md
     owner: hitl
-    depends_on: DOC-012
+    depends_on: [DOC-012]
