@@ -2,4 +2,4 @@
 
 Re-approve every document listed here before advancing.
 
-- DOC-003  orchestration/bootstrap.yaml  [modified] changed since approval; re-approve
+- DOC-004  AGENTS.md  [stale] prerequisite moved: DOC-003

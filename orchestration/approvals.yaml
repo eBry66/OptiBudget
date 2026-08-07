@@ -52,3 +52,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-07
     based_on: []
     note: "UX.md added to graph"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-07
+    based_on: [DOC-003@aac0cbcb0d069930c4ab01529d3028d3ddd6780f]
+    note: "UX.md added to graph"
