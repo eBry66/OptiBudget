@@ -82,3 +82,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-07
     based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
     note: "seven fundamentals, household-scoped access, no advice"
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    commit: deb07c28f2e443d0b72b722868a02fe5d7328a4c
+    approved_at: 2026-08-10
+    based_on: [DOC-008@6ab347d0b0ff413a707e5c466aeab85d9f4a4915]
+    note: "movement/transaction/transfer split, reducibility and provisioning separated, co-ownership terms distinguished from household accounts"
