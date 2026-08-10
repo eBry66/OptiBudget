@@ -21,44 +21,65 @@ per household.
 ## Accounts
 
 **Account** — a bank account held by the household. Every account has exactly one
-role. OptiBudget recognises four.
+role. OptiBudget recognises four roles, and a household may hold more than one
+account in the same role.
 
-**Spending Account** — the account from which the household pays third parties.
-It is the only account that can pay a third party. Local equivalent: compte à
-vue (BE), compte courant (LU).
+**Spending Account** — an account from which the household pays third parties. It
+is the only role that can pay a third party. Local equivalent: compte à vue
+(BE), compte courant (LU).
 
 **Provision Account** — a savings account holding enough money to pay at least
-one full year of the household's non-monthly recurring expenses. It cannot pay a
-third party. When such an expense falls due, money is transferred from here to
-the spending account, and the payment is made from there.
+one full year of the household's provisioned expenses. It cannot pay a third
+party. When such an expense falls due, money is moved from here to a spending
+account, and the payment is made from there.
 
 **Contingency Account** — a savings account holding money against large expenses
 the household cannot predict: an accident, a serious illness, a structural
-repair. Like the provision account, it cannot pay a third party. Money is
-transferred from here to the spending account when such an expense arises.
+repair. Like a provision account, it cannot pay a third party. Money is moved
+from here to a spending account when such an expense arises.
 
 **Securities Account** — an account holding securities, linked to a spending
 account. Local equivalents: compte-titres (BE), dossier titres (LU).
 
+**Reference Balance** — the amount an account held on a stated date, recorded by
+the household. Every balance OptiBudget shows is derived from a reference
+balance and the movements recorded after it. Without one, the movements
+OptiBudget holds give the change in an account, not its balance.
+
 ## Money moving
 
-**Movement** — any change of money recorded by OptiBudget. Every movement is
-either a transaction or a transfer, never both.
+**Movement** — one line of an account's history: an amount, a date, a
+description, and the account it belongs to. A movement is recorded by importing
+it from a file the bank produced, or by the household entering it by hand.
 
 **Transaction** — a movement in which money enters or leaves the household. A
-payment to a third party, income received, a fee charged by a bank.
+payment to a third party, income received, a fee charged by a bank, a cash
+withdrawal.
 
-**Transfer** — a movement of money between two accounts held by the same
-household. A transfer does not change what the household owns. It appears in the
-bank exports of both accounts, as a debit in one and a credit in the other, and
-OptiBudget records those two lines as one transfer.
+**Transfer** — the fact that two movements in two accounts of the same household
+are one displacement of money: a debit in one account and the matching credit in
+the other. A transfer links two movements. It is not itself a movement, and it
+does not replace or hide either of the movements it links. Money covered by a
+transfer has not entered or left the household, so a transfer is never counted
+as spending or as income.
 
-Paying an expense from provisioned money is two movements: a transfer from the
-provision account to the spending account, then a transaction from the spending
-account to the third party. Only the transaction is spending.
+**Transfer Candidate** — two movements OptiBudget believes may be a transfer,
+where the evidence is not conclusive. A candidate is not a transfer until the
+household confirms it.
 
-**Import** — the act of reading a bank's exported file of movements for one
-account into OptiBudget.
+**Counterparty** — who a transaction was with, as recorded in the movement's
+description.
+
+**Import** — reading a file a bank has exported, containing the movements of one
+account, into OptiBudget.
+
+**Transaction Reference** — an identifier a bank assigns to a movement and
+includes in its export. Where a bank provides one, two movements with the same
+reference are the same movement. Not every bank provides one.
+
+**Duplicate Candidate** — a movement in an import that OptiBudget believes it may
+already hold, where no transaction reference is available to settle the
+question. A duplicate candidate is not discarded until the household says so.
 
 ## Classifying spending
 
@@ -92,16 +113,15 @@ The first three values mean spending the household could act on. Irreducible
 means spending it cannot. The last three mean the answer is not yet established.
 
 **Provisioning** — a property of a leaf category stating whether this household
-funds it in advance from the provision account rather than from the income of
-the period in which it falls. It has two values: **Provisioned** and **Not
-Provisioned**. Provisioning applies only to categories whose reducibility is
-irreducible, because spending the household could avoid is not worth funding in
-advance. OptiBudget supplies a default value per category; the household may
-change it.
+funds it in advance from a provision account rather than from the income of the
+period in which it falls. It has two values: **Provisioned** and **Not
+Provisioned**. OptiBudget supplies a default value per category; the household
+may change it.
 
-Reducibility and provisioning are independent properties answering different
-questions. Reducibility asks how far the spending could change. Provisioning
-asks where the money to pay it comes from.
+Reducibility and provisioning are independent. Reducibility asks how far the
+spending could change. Provisioning asks where the money to pay it comes from. A
+household can provision an annual holiday it could also renounce, and can decline
+to provision an irreducible expense it prefers to absorb month by month.
 
 ## Expenses over time
 
@@ -109,9 +129,27 @@ asks where the money to pay it comes from.
 
 **Year** — one calendar year. A year is twelve periods.
 
+**Reference Period** — the most recent twelve complete periods. Calculations of
+what a household must set aside are based on what it spent over its reference
+period.
+
 **Recurring Expense** — spending that repeats on a known rhythm. Monthly
 recurring expenses fall in every period. Non-monthly recurring expenses fall
-less often than every period, and are what the provision account exists to fund.
+less often than every period, and are what a provision account exists to fund.
+
+**Provision Target** — what a provision account must hold to cover one full year
+of the household's provisioned expenses. It is calculated from what the
+household spent on those categories over its reference period, increased by an
+inflation rate.
+
+**Inflation Rate** — the yearly rate by which past amounts are increased when
+calculating a provision target. It defaults to two percent and the household may
+change it.
+
+**Contingency Target** — what a contingency account must hold. Unlike a provision
+target it is not calculated. The household states it.
+
+**Shortfall** — the amount by which an account's balance falls below its target.
 
 ## Co-ownership
 
@@ -122,64 +160,83 @@ copropriétaires / ACP (BE), vereniging van mede-eigenaars / VME (BE).
 **Syndic** — the party that administers a co-ownership and invoices its members.
 
 **Syndic Statement** — a document issued by the syndic to the household, stating
-what it owes. A syndic statement is not itself a movement. Paying it is.
+what it owes. A syndic statement is not a movement. Paying it is.
 
 **Common Charges** — expenses of the co-ownership shared among its members in
 proportion to their share of the building. Cleaning, lift maintenance,
 common-area electricity, management fees.
 
 **Individual Charges** — expenses the syndic bills to one household for its own
-consumption, chiefly heating. Paid in advance against an estimate and settled
-against actual use at the end of the co-ownership's financial year.
+consumption, chiefly heating. Paid in advance against an estimate.
+
+**Charge Settlement** — the syndic's statement of what a household's individual
+charges actually came to over the co-ownership's financial year, set against
+what it paid in advance. It produces an amount owed by or due to the household.
 
 **Working Capital Fund** — money held by the co-ownership to pay its periodic
-expenses, funded by advances from its members. A member's share is repayable
-when the property is sold. Local equivalent: fonds de roulement.
+expenses, funded by advances from its members. A member's share is repayable when
+the property is sold. Local equivalent: fonds de roulement.
 
 **Reserve Fund** — money held by the co-ownership to pay expenses that do not
 recur, such as replacing a lift or a roof. A member's share is not repayable on
 sale unless the sale contract says so. Local equivalent: fonds de réserve.
 
-**Fund Contribution** — a payment by the household into the working capital fund
-or the reserve fund. A fund contribution is a transaction. Whether the household
-can recover it later depends on which fund received it.
+**Fund Contribution** — a payment by the household into a working capital fund or
+a reserve fund. A fund contribution is a transaction. It is not money the
+household holds: the co-ownership holds the fund, and the household holds a claim
+on it proportional to its share of the building. A contribution to a working
+capital fund is attributable to the household and may be recovered on sale. A
+contribution to a reserve fund is not.
 
 Working Capital Fund and Reserve Fund always mean the co-ownership's money. They
 never refer to an account held by the household.
 
 ## Investments
 
-**Security** — one financial instrument that can be held in a securities
-account: a share, a bond, a SICAV, a unit in a fund. Local equivalent: titre.
+**Security** — one financial instrument that can be held in a securities account:
+a share, a bond, a SICAV, a unit in a fund. Local equivalent: titre.
 
 **Position** — the quantity of one security the household holds in one securities
 account at a stated moment. Buying increases a position; selling reduces it. A
 position of zero means the household no longer holds that security.
 
+**Security Transaction** — the purchase or sale of a security: which security,
+how many units, at what price, and what fee was charged. A security transaction
+changes a position. It is settled by movements in the household's accounts, and
+OptiBudget links it to them so that the same money is never counted twice — once
+as the purchase and again as the payment.
+
 **Valuation** — the value of one unit of a security on a stated date. A valuation
-is not a movement: it changes what the household's holdings are worth without
-any money changing hands. Every valuation is of one of two kinds, and the kind
-is always recorded.
+is not a movement: it changes what the household's holdings are worth without any
+money changing hands. Every valuation is of one of two kinds, and the kind is
+always recorded.
 
 **Statement Valuation** — a valuation calculated by the bank on the closing date
-of a period it reports on, typically a quarter or a year. It is the
-authoritative record of what a security was worth on that date. A statement
-valuation is never replaced or overwritten. Local equivalent: valeur
-d'inventaire.
+of a period it reports on, typically a quarter or a year. It is the authoritative
+record of what a security was worth on that date, and is never replaced or
+overwritten. Local equivalent: valeur d'inventaire.
 
 **Indicative Valuation** — a valuation the household records for a security on a
 date of its choosing, taken from a public quotation. It exists so the household
-can see what its holdings are worth today rather than at the last statement
-date, when deciding whether to buy or sell. It is not authoritative and never
-replaces a statement valuation.
+can see what its holdings are worth today rather than at the last statement date.
+It is not authoritative and never replaces a statement valuation.
+
+**Gain** — what a position has earned or lost, in euros: what the household would
+receive for it at its most recent valuation, plus anything already received from
+selling part of it, less what it paid and less every fee charged.
+
+**Return** — a gain expressed as a percentage of what the household paid. Gain
+and return are both stated net of fees, and both are stated against a named
+valuation, with its date and kind.
 
 ## Balances and views
 
 **Balance** — the amount of money an account holds at a stated moment, derived
-from the movements imported for it.
+from its reference balance and the movements recorded since that date. Every
+balance is shown with the date of the most recent movement it includes.
 
 **Holdings** — what the household owns in its securities accounts: its positions,
 each valued at the most recent valuation of the security. Holdings are stated
 separately from balances, because a balance derives from movements and a
-valuation does not. Where holdings are shown, the date and kind of the
-valuations used are shown with them.
+valuation does not. Where holdings are shown, the date and kind of the valuations
+used are shown with them.
