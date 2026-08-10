@@ -112,3 +112,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "reporting and source currency, average cost basis, investment income in gain"
+  - id: DOC-010
+    path: product/DECISIONS.md
+    commit: d3871fa1d90803358aa0b25448b168e608dc1133
+    approved_at: 2026-08-10
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "prerequisite moved"
