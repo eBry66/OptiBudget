@@ -18,6 +18,20 @@ is granted by membership of a household and by nothing else. No member of one
 household can see the information of another. Version 1 has exactly one member
 per household.
 
+## Money and currency
+
+**Reporting Currency** — the euro. Every figure OptiBudget presents for
+comparison, totalling, or reporting is in euros.
+
+**Source Currency** — the currency in which an amount was originally stated by
+the bank, the syndic, or the market. Where it is not the reporting currency,
+OptiBudget records the source amount and its currency alongside the euro figure
+derived from it.
+
+**Exchange Rate** — the rate, with the date it applied to, used to express a
+source amount in the reporting currency. OptiBudget states the rate it used with
+any figure it converted. It does not forecast rates or advise on them.
+
 ## Accounts
 
 **Account** — a bank account held by the household. Every account has exactly one
@@ -43,8 +57,12 @@ account. Local equivalents: compte-titres (BE), dossier titres (LU).
 
 **Reference Balance** — the amount an account held on a stated date, recorded by
 the household. Every balance OptiBudget shows is derived from a reference
-balance and the movements recorded after it. Without one, the movements
+balance and the movements recorded around it. Without one, the movements
 OptiBudget holds give the change in an account, not its balance.
+
+**Coverage Date** — the date through which OptiBudget holds the movements of an
+account. A balance calculated for a date later than the coverage date rests on
+the absence of movements rather than on their presence, and OptiBudget says so.
 
 ## Money moving
 
@@ -54,7 +72,8 @@ it from a file the bank produced, or by the household entering it by hand.
 
 **Transaction** — a movement in which money enters or leaves the household. A
 payment to a third party, income received, a fee charged by a bank, a cash
-withdrawal.
+withdrawal. Every movement is a transaction unless a transfer links it to
+another.
 
 **Transfer** — the fact that two movements in two accounts of the same household
 are one displacement of money: a debit in one account and the matching credit in
@@ -63,9 +82,8 @@ does not replace or hide either of the movements it links. Money covered by a
 transfer has not entered or left the household, so a transfer is never counted
 as spending or as income.
 
-**Transfer Candidate** — two movements OptiBudget believes may be a transfer,
-where the evidence is not conclusive. A candidate is not a transfer until the
-household confirms it.
+**Transfer Candidate** — two movements OptiBudget believes may be the two sides
+of a transfer. A candidate is not a transfer until the household confirms it.
 
 **Counterparty** — who a transaction was with, as recorded in the movement's
 description.
@@ -74,8 +92,8 @@ description.
 account, into OptiBudget.
 
 **Transaction Reference** — an identifier a bank assigns to a movement and
-includes in its export. Where a bank provides one, two movements with the same
-reference are the same movement. Not every bank provides one.
+includes in its export. Where a bank provides one, two movements of the same
+account sharing a reference are the same movement. Not every bank provides one.
 
 **Duplicate Candidate** — a movement in an import that OptiBudget believes it may
 already hold, where no transaction reference is available to settle the
@@ -87,6 +105,10 @@ question. A duplicate candidate is not discarded until the household says so.
 in exactly two levels: a parent category and, beneath it, leaf categories. Every
 transaction has exactly one leaf category. Where a transaction covers more than
 one kind of thing, it takes the leaf category of the dominant part.
+
+**Uncategorised** — the leaf category a transaction takes when OptiBudget cannot
+establish what it was for. It means the kind of spending is unknown, which is a
+different thing from a known category whose reducibility has not been decided.
 
 **Reducibility** — a property of a leaf category stating how far this household
 could change what it spends there. Every leaf category has exactly one
@@ -170,8 +192,8 @@ common-area electricity, management fees.
 consumption, chiefly heating. Paid in advance against an estimate.
 
 **Charge Settlement** — the syndic's statement of what a household's individual
-charges actually came to over the co-ownership's financial year, set against
-what it paid in advance. It produces an amount owed by or due to the household.
+charges actually came to over the co-ownership's financial year, set against what
+it paid in advance. It produces an amount owed by or due to the household.
 
 **Working Capital Fund** — money held by the co-ownership to pay its periodic
 expenses, funded by advances from its members. A member's share is repayable when
@@ -200,11 +222,20 @@ a share, a bond, a SICAV, a unit in a fund. Local equivalent: titre.
 account at a stated moment. Buying increases a position; selling reduces it. A
 position of zero means the household no longer holds that security.
 
-**Security Transaction** — the purchase or sale of a security: which security,
-how many units, at what price, and what fee was charged. A security transaction
-changes a position. It is settled by movements in the household's accounts, and
-OptiBudget links it to them so that the same money is never counted twice — once
-as the purchase and again as the payment.
+**Security Transaction** — the purchase or sale of a security: which one, whether
+bought or sold, how many units, at what price, and what fee was charged. A
+security transaction changes a position. It is settled by movements in the
+household's accounts, and OptiBudget links it to them so that the same money is
+never counted twice — once as the purchase and again as the payment.
+
+**Investment Income** — money a security pays its holder without any part of the
+position being sold: a dividend, a distribution, a coupon, interest.
+
+**Average Cost** — what one unit of a position cost, taken as the total the
+household paid for every unit it bought divided by the number of units bought.
+Where a position was built by purchases at different prices, average cost is what
+OptiBudget uses to say what a sold or held unit cost. OptiBudget states that it
+uses average cost wherever it shows a figure derived from it.
 
 **Valuation** — the value of one unit of a security on a stated date. A valuation
 is not a movement: it changes what the household's holdings are worth without any
@@ -222,21 +253,22 @@ can see what its holdings are worth today rather than at the last statement date
 It is not authoritative and never replaces a statement valuation.
 
 **Gain** — what a position has earned or lost, in euros: what the household would
-receive for it at its most recent valuation, plus anything already received from
-selling part of it, less what it paid and less every fee charged.
+receive for the units it still holds at their most recent valuation, plus what it
+received for units already sold, plus the investment income the position has
+paid, less the average cost of every unit it bought and less every fee charged.
 
-**Return** — a gain expressed as a percentage of what the household paid. Gain
-and return are both stated net of fees, and both are stated against a named
+**Return** — a gain expressed as a percentage of what the household paid. Gain and
+return are both stated net of fees, and both are stated against a named
 valuation, with its date and kind.
 
 ## Balances and views
 
 **Balance** — the amount of money an account holds at a stated moment, derived
-from its reference balance and the movements recorded since that date. Every
-balance is shown with the date of the most recent movement it includes.
+from its reference balance and the movements recorded around it. Every balance is
+shown with the coverage date of its account. A balance is money only. A valuation
+is never part of a balance.
 
 **Holdings** — what the household owns in its securities accounts: its positions,
 each valued at the most recent valuation of the security. Holdings are stated
-separately from balances, because a balance derives from movements and a
-valuation does not. Where holdings are shown, the date and kind of the valuations
-used are shown with them.
+separately from balances, and where they are shown, the date and kind of the
+valuations used are shown with them.
