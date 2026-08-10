@@ -130,3 +130,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-011@52714fa46fccc4857a9cbf5745df9ad0182355d7]
     note: "3-release split, 93 REQs mapped, BNP Fortis + ING Lux CSV for R1"
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    commit: 0099fc3990ddf9efd8e125712c5cf612c0a3153f
+    approved_at: 2026-08-10
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "Return denominator defined as total purchase consideration incl. fees; Fee term added"
