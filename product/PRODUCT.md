@@ -53,28 +53,29 @@ professional.
 
 ## How it treats reducible expenses
 
-Every expense category carries a fixed classification stating how far spending
-in it can be reduced: stopped entirely, reduced but not stopped, or untouchable.
-A gym subscription can be stopped. Food can be reduced but not stopped. A tax
-bill is untouchable. That classification belongs to the category, not to the
-individual expense, and the household cannot change it.
+Every expense category carries a classification stating how far spending in it
+can be reduced: stopped entirely, reduced but not stopped, renegotiated, or not
+changed at all. A gym subscription can be stopped. Food can be reduced but not
+stopped. A tax bill cannot be touched.
+
+That classification arrives with a sensible default, and the household can
+change it, because whether spending is avoidable depends on circumstances rather
+than on the kind of spending. A car is optional for a household that could live
+without one and necessary for a household that could not.
 
 OptiBudget groups expenses by that classification and shows what each one costs
 over a year. It does not decide what should be cut, does not rank candidates,
 and does not recommend. The household reads the grouping and decides.
 
-The classification stays fixed because nothing yet depends on it being
-personalised. If OptiBudget ever proposes cost-cutting scenarios of its own,
-that will change, because a scenario built on a classification the household
-disagrees with is worse than no scenario. That is not in scope.
-
 ## What it is not
 
-- Not a multi-currency system. A household's money is held in one currency.
 - Not an adviser. It does not recommend what to cut, how to reduce tax, or what
   to invest in. It shows the household its own money clearly and stops there.
 - Not a scenario or simulation tool. It reports what is, not what would happen
   if.
+- Not a currency manager. It reports in euros. Where a bank or a security states
+  an amount in another currency it records that currency and says what rate it
+  used, but it does not hold money, convert it, or advise on it.
 - Not a real estate management tool. It tracks the charges and the mortgage on a
   home the household lives in, not a portfolio of properties.
 - Not an investment platform. It records what the household holds. It does not
