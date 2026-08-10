@@ -142,3 +142,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-009@0099fc3990ddf9efd8e125712c5cf612c0a3153f]
     note: "re-approved after DOC-009 Return/Fee definitions added; no content change"
+  - id: DOC-013
+    path: product/ACCEPTANCE.md
+    commit: 5624b8dbef88bbc3ab431c32cb98f02862fbb3a9
+    approved_at: 2026-08-10
+    based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
+    note: "89 ACs mirroring REQ ids; worked examples for provisioning and securities math; AC-071 uses GLOSSARY.md Return definition"
