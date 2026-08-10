@@ -100,3 +100,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-008@6ab347d0b0ff413a707e5c466aeab85d9f4a4915]
     note: "transfer as relationship, reference balance, gain and return defined, provisioning decoupled from reducibility"
+  - id: DOC-008
+    path: product/PRODUCT.md
+    commit: 33acf83670c95fa774e1e40d6959247593964ea6
+    approved_at: 2026-08-10
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "euro is reporting currency, source currency retained; reducibility default overridable"
