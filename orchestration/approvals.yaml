@@ -94,3 +94,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-008@6ab347d0b0ff413a707e5c466aeab85d9f4a4915]
     note: "five founding decisions: public repo, no prototype merge, household-overridable classification, fund recoverability, no advice"
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    commit: 658f33f4ee6bf87e1bde01c4f8c6e864624df210
+    approved_at: 2026-08-10
+    based_on: [DOC-008@6ab347d0b0ff413a707e5c466aeab85d9f4a4915]
+    note: "transfer as relationship, reference balance, gain and return defined, provisioning decoupled from reducibility"
