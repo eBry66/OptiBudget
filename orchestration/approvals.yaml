@@ -106,3 +106,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
     note: "euro is reporting currency, source currency retained; reducibility default overridable"
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    commit: e95cf1c44354287dc30ff8ea62b6a1b3a503dd9a
+    approved_at: 2026-08-10
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "reporting and source currency, average cost basis, investment income in gain"
