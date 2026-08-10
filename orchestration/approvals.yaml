@@ -124,3 +124,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-10
     based_on: [DOC-009@e95cf1c44354287dc30ff8ea62b6a1b3a503dd9a]
     note: "93 requirements; reference balances, household-confirmed transfers and duplicates, average cost, euro reporting with source currency"
+  - id: DOC-012
+    path: product/SCOPE.md
+    commit: 624f89339cb99160d19824cc589d59d98d5b5529
+    approved_at: 2026-08-10
+    based_on: [DOC-011@52714fa46fccc4857a9cbf5745df9ad0182355d7]
+    note: "3-release split, 93 REQs mapped, BNP Fortis + ING Lux CSV for R1"
