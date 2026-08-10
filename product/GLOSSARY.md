@@ -257,9 +257,18 @@ receive for the units it still holds at their most recent valuation, plus what i
 received for units already sold, plus the investment income the position has
 paid, less the average cost of every unit it bought and less every fee charged.
 
-**Return** — a gain expressed as a percentage of what the household paid. Gain and
-return are both stated net of fees, and both are stated against a named
-valuation, with its date and kind.
+**Return** — a gain expressed as a percentage of what the household paid. "What
+the household paid" is the total consideration paid to acquire every unit the
+position has ever held: the sum, across every purchase security transaction for
+that position, of units bought multiplied by price, plus every fee charged on
+those purchases. It does not change when units are sold or when a position's
+valuation changes. Gain and return are both stated net of fees, and both are
+stated against a named valuation, with its date and kind.
+
+**Fee** — an amount a broker or bank charges for executing or holding a security
+transaction or a position. Every fee charged on a purchase counts toward what the
+household paid for Return. Every fee OptiBudget knows about, on a purchase or a
+sale, reduces Gain.
 
 ## Balances and views
 
