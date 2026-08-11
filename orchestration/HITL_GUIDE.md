@@ -4,6 +4,13 @@ Windows 11 · VS Code · Git · GitHub · Vercel · Supabase
 Audience: one non-technical HITL, working alone.
 Supersedes: OptiBudget_HITL_Guide_2.docx
 
+Revision note (this version): added `assets/brand/` to the standard folder
+set (sections 3, 4.14), documented where binary brand assets live relative
+to `product/ASSETS.md` (section 6.8), added `assets/**` to the template
+content boundary (section 13.2), and brought the guide itself into the
+approval graph as DOC-026 with `owner: hitl`, `depends_on: []` (sections
+4.3, 4.13) — tracked the same way `AGENTS.md` already is.
+
 ## 0. How to Use This Guide
 
 If you have never used Git and do not know what a commit is, read Appendix A at the end of this document first. Nothing in sections 2 to 5 will make sense without it.
@@ -133,7 +140,7 @@ Only once `pwd` is correct:
 
 ```powershell
 git init
-mkdir orchestration, orchestration\tasks, product, engineering, engineering\adr, scripts, tests, src, supabase, supabase\migrations, .codex, .claude, .github, .github\workflows
+mkdir orchestration, orchestration\tasks, product, engineering, engineering\adr, assets\brand, scripts, tests, src, supabase, supabase\migrations, .codex, .claude, .github, .github\workflows
 code .
 ```
 
@@ -285,6 +292,14 @@ documents:
     path: project.state.yaml
     owner: hitl
     depends_on: [DOC-013, DOC-014, DOC-019, DOC-020, DOC-021, DOC-022, DOC-023]
+  - id: DOC-025
+    path: product/UX.md
+    owner: hitl
+    depends_on: [DOC-012]
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    owner: hitl
+    depends_on: []
 ```
 
 ### 4.4 AGENTS.md (machinery)
@@ -478,6 +493,61 @@ required_checks:
 frozen: false
 ```
 
+### 4.13 orchestration/HITL_GUIDE.md (machinery)
+
+This guide is itself a file in the repository, not just something you read
+alongside it. Save this document, verbatim, at `orchestration/HITL_GUIDE.md`
+as part of the initial bootstrap commit in section 4. It is DOC-026 in
+`bootstrap.yaml` (section 4.3) — `depends_on: []`, because unlike most
+documents in this graph it is not built on another document's content, only
+on your own reading of it. Re-approve it, the same way you re-approve
+`AGENTS.md` (DOC-004, section 10 point 4), whenever you hand-edit it or after
+a future `scripts/template-sync.mjs` run changes it.
+
+### 4.14 Resulting folder structure
+
+What `C:\Dev\OptiBudget` contains once section 3's folders exist and every
+file in section 4 has been created and committed. Folders with nothing in
+them yet are noted as empty — Git does not track empty folders, so they
+exist on your disk from `mkdir` but will not appear in `git status` until
+something is placed inside.
+
+```
+C:\Dev\OptiBudget\
+├── .claude\
+│   └── settings.json
+├── .codex\
+│   └── config.toml
+├── .github\
+│   └── workflows\          (empty until task-001)
+├── assets\
+│   └── brand\               (empty until a logo exists — section 6.8)
+├── engineering\
+│   └── adr\                 (empty until an ADR is written)
+├── orchestration\
+│   ├── tasks\                (empty until task-001)
+│   ├── approvals.yaml
+│   ├── bootstrap.yaml
+│   ├── BOOTSTRAP.md
+│   ├── HITL_GUIDE.md
+│   └── PROJECT_RULES.md      (placeholder — completed and approved at DOC-023)
+├── product\                  (empty until the gate 0 loop, section 5)
+├── scripts\
+│   └── next.mjs
+├── src\                      (empty until task-002 or later)
+├── supabase\
+│   └── migrations\           (empty until task-002 or later)
+├── tests\                    (empty until task-001)
+├── .gitattributes
+├── .gitignore
+├── AGENTS.md
+└── CLAUDE.md
+```
+
+`orchestration/REVIEW_BRIEF.md` (DOC-021) and `project.state.yaml` (DOC-024)
+are not in this tree — both are written later, once their prerequisites are
+approved (section 4.9, section 4.12), not as part of the initial bootstrap.
+
 ## 5. The Gate 0 Loop
 
 Repeat this exact cycle until section 10 says you are done. One document per cycle. No exceptions, no batching.
@@ -548,6 +618,16 @@ Which screens exist, what appears on each, and how you move between them. Not a 
 ### 6.8 product/ASSETS.md (DOC-014)
 
 Logos, fonts, colours, icons, and their licences. Short.
+
+The files themselves — the logo images, and any other binary brand asset —
+do not live in `product/`. They live in `assets/<category>/` at the
+repository root (`assets/brand/` for the logo), created in section 3 like
+any other folder. `product/ASSETS.md` describes what they are and states
+their path; it does not contain them. Naming convention:
+`<product>-<asset>-<variant>.<ext>`, lowercase, hyphen-separated — e.g.
+`optibudget-mark-color-on-teal.png`. Changing which files exist there is a
+change to `product/ASSETS.md` and needs re-approval, even though the binary
+files are not themselves gated by `bootstrap.yaml`.
 
 ### 6.9 engineering/TESTING.md (DOC-017)
 
@@ -696,7 +776,7 @@ Two zones, and the entire template mechanism is nothing but this line drawn in a
 
 Machinery: identical in every project, contains no project noun, overwritten without being read. `AGENTS.md`, `CLAUDE.md`, `.gitattributes`, `.claude/settings.json`, `.codex/config.toml`, `scripts/next.mjs`, `scripts/template-sync.mjs`, `orchestration/BOOTSTRAP.md`, `orchestration/REVIEW_BRIEF.md`, `orchestration/HITL_GUIDE.md`, and later `.github/workflows/`.
 
-Content: specific to one project, never touched by any sync. `product/**`, `engineering/**`, `src/**`, `tests/**`, `supabase/**`, `orchestration/tasks/**`, `orchestration/approvals.yaml`, `orchestration/PROJECT_RULES.md`, `orchestration/bootstrap.yaml`, `project.state.yaml`, `package.json`, `.env.example`, `.gitignore`, `README.md`.
+Content: specific to one project, never touched by any sync. `product/**`, `assets/**`, `engineering/**`, `src/**`, `tests/**`, `supabase/**`, `orchestration/tasks/**`, `orchestration/approvals.yaml`, `orchestration/PROJECT_RULES.md`, `orchestration/bootstrap.yaml`, `project.state.yaml`, `package.json`, `.env.example`, `.gitignore`, `README.md`.
 
 `bootstrap.yaml` sits on the content side even though its shape is generic: its document list is a project decision, and overwriting it would invalidate every approval that references a DOC id.
 

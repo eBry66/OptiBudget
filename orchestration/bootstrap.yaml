@@ -100,3 +100,7 @@ documents:
     path: product/UX.md
     owner: hitl
     depends_on: [DOC-012]
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    owner: hitl
+    depends_on: []
