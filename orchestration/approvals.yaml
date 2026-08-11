@@ -280,3 +280,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-011@67ff794b17394ab49272721e77b70b4fc9ae00bf]
     note: "re-read against revised REQ-004; no content change needed, SCOPE.md only references the REQ id"
+  - id: DOC-015
+    path: engineering/ARCHITECTURE.md
+    commit: 60000ab01fac982a733344013cf46585e394b54a
+    approved_at: 2026-08-11
+    based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
+    note: "2 review rounds, 12 total fixes; service_role/REQ-004 contradiction resolved via REQ-004 revision (DOC-011), not architecture change"
