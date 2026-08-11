@@ -250,3 +250,15 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
     note: "6 R1 screens + Connexion; grouped-by-category review, per-account balances, and drill-down added to close REQ-035/078/079/086 gaps not covered by wireframing"
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    commit: 4e80fd1de94f5133789de0d6eed68ec2f61050aa
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "RLS as highest-risk area, REQ-093 and currency-retention as core constraints, 2-vendor setup"
+  - id: DOC-017
+    path: engineering/TESTING.md
+    commit: 4e80fd1de94f5133789de0d6eed68ec2f61050aa
+    approved_at: 2026-08-11
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9]
+    note: "AC naming contract: tests/<area>/AC-0NN.<slug>.test.ts, [AC-0NN] test title prefix"
