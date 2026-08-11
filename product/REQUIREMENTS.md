@@ -18,8 +18,18 @@ household they are a member of, and of no other household.
 financial information by any means offered by OptiBudget.
 
 **REQ-004** — Administering the application for a household does not grant access
-to the financial information of any other household. No role exists that can see
-across households.
+to the financial information of any other household. No role OptiBudget's own
+access-control system grants — to a household member, or to any
+application-facing process acting on a household's behalf — can see across
+households.
+
+This does not extend to direct infrastructure access outside that system: the
+project's database administrator credentials, or the hosting provider's own
+operational access to its infrastructure. No product requirement can
+constrain that, for any hosted system, and OptiBudget does not claim to. Such
+access is not part of OptiBudget's own access-control system, is never
+provisioned to the running application or its automation, and any deliberate
+use of it is recorded in `product/DECISIONS.md`.
 
 ## Accounts and balances
 
