@@ -268,3 +268,15 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "logged staff-access proposal as deferred during DOC-015 review; REQ-004 unchanged"
+  - id: DOC-011
+    path: product/REQUIREMENTS.md
+    commit: 67ff794b17394ab49272721e77b70b4fc9ae00bf
+    approved_at: 2026-08-11
+    based_on: [DOC-009@0099fc3990ddf9efd8e125712c5cf612c0a3153f]
+    note: "REQ-004 clarified: excludes DB-admin/hosting-provider infrastructure access, which no product requirement can constrain; closes the service_role/REQ-004 contradiction found in DOC-015 review"
+  - id: DOC-012
+    path: product/SCOPE.md
+    commit: 624f89339cb99160d19824cc589d59d98d5b5529
+    approved_at: 2026-08-11
+    based_on: [DOC-011@67ff794b17394ab49272721e77b70b4fc9ae00bf]
+    note: "re-read against revised REQ-004; no content change needed, SCOPE.md only references the REQ id"
