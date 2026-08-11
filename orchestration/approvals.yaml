@@ -238,3 +238,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
     note: "cascade from DOC-012; no content change"
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    commit: 7b512e8cd13f8cdbe30d54d110841dbe7261c75d
+    approved_at: 2026-08-11
+    based_on: []
+    note: "initial: assets/brand convention, folder tree, DOC-025/026 self-tracking added"
