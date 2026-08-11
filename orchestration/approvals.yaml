@@ -160,3 +160,81 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
     note: "logo files added to assets/brand/, PNG only, no SVG source; OptiBudget Teal as sole brand colour"
+  - id: DOC-003
+    path: orchestration/bootstrap.yaml
+    commit: 7b512e8cd13f8cdbe30d54d110841dbe7261c75d
+    approved_at: 2026-08-11
+    based_on: []
+    note: "added DOC-025 (UX.md), DOC-026 (HITL_GUIDE.md) to graph; no other change"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-11
+    based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
+    note: "cascade from DOC-003; no content change"
+  - id: DOC-005
+    path: CLAUDE.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-006
+    path: .codex/config.toml
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-007
+    path: .claude/settings.json
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-008
+    path: product/PRODUCT.md
+    commit: 33acf83670c95fa774e1e40d6959247593964ea6
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-11
+    based_on: [DOC-004@449b010681c88fbb7a99f4fd85cba6785d8b2e75]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-009
+    path: product/GLOSSARY.md
+    commit: 0099fc3990ddf9efd8e125712c5cf612c0a3153f
+    approved_at: 2026-08-11
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "cascade from DOC-008; no content change"
+  - id: DOC-010
+    path: product/DECISIONS.md
+    commit: d3871fa1d90803358aa0b25448b168e608dc1133
+    approved_at: 2026-08-11
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "cascade from DOC-008; no content change"
+  - id: DOC-011
+    path: product/REQUIREMENTS.md
+    commit: 52714fa46fccc4857a9cbf5745df9ad0182355d7
+    approved_at: 2026-08-11
+    based_on: [DOC-009@0099fc3990ddf9efd8e125712c5cf612c0a3153f]
+    note: "cascade from DOC-009; no content change"
+  - id: DOC-012
+    path: product/SCOPE.md
+    commit: 624f89339cb99160d19824cc589d59d98d5b5529
+    approved_at: 2026-08-11
+    based_on: [DOC-011@52714fa46fccc4857a9cbf5745df9ad0182355d7]
+    note: "cascade from DOC-011; no content change"
+  - id: DOC-013
+    path: product/ACCEPTANCE.md
+    commit: 5624b8dbef88bbc3ab431c32cb98f02862fbb3a9
+    approved_at: 2026-08-11
+    based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
+    note: "cascade from DOC-012; no content change"
+  - id: DOC-014
+    path: product/ASSETS.md
+    commit: 38ae74e662d50e0e665e61787778ec1abe1ae8a3
+    approved_at: 2026-08-11
+    based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
+    note: "cascade from DOC-012; no content change"
