@@ -96,3 +96,38 @@ what it had stopped noticing, and every part of it is checkable.
 added later, the household will need to be able to disagree with a category's
 reducibility for its own reasons — which is already possible under the decision
 above.
+
+## 2026-08-11 — Staff cross-household access stays out of scope; REQ-004 remains absolute
+
+**Decided:** OptiBudget has no role, mechanism, or credential capable of
+accessing more than one household's data — including for OptiBudget's own
+administration. `REQ-004`'s wording ("no role exists that can see across
+households") and `product/PRODUCT.md`'s independent statement of the same
+commitment ("access... is granted by membership of that household and by
+nothing else") both stand as written, unmodified.
+
+**Why:** a proposal was raised during `DOC-015` review to split this into
+two invariants — household-to-household isolation (absolute) and a
+separate, audited OptiBudget-staff administration path (controlled access
+to a specific household). The distinction is real and not unreasonable for
+a product with a support organization. It was not adopted now because: (1)
+it is a product-phase decision — it would require reopening `PRODUCT.md`
+and `REQUIREMENTS.md`, both approved — not something to fold into an
+engineering document mid-review; (2) there is no live operational need —
+OptiBudget has one operator, no staff, no support organization touching
+household data; (3) the proposed replacement stated intent ("access should
+be limited," "actions should be logged") without the concrete mechanism —
+scoped, time-bounded, audited access — that current security practice
+requires for this pattern to be safe, which would have been a real
+regression from the zero-standing-privilege design `engineering/
+ARCHITECTURE.md` (DOC-015) adopted instead.
+
+**Rules out:** any `service_role` or equivalent standing credential capable
+of reading across households, for any purpose, in the current version.
+
+**Revisit when:** OptiBudget has an actual support or administrative
+operation that needs to touch a specific household's data on the
+household's behalf — not before. If adopted then, it needs its own REQ id
+in `product/REQUIREMENTS.md`, stating explicitly: who can authorize it,
+what triggers it, how a household would know, and where the audit record
+lives — with the same rigor as every other requirement, not a retrofit.
