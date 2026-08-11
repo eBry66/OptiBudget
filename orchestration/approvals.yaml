@@ -154,3 +154,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-11
     based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
     note: "wordmark only, neutral palette with single accent, Inter, Lucide icons"
+  - id: DOC-014
+    path: product/ASSETS.md
+    commit: 38ae74e662d50e0e665e61787778ec1abe1ae8a3
+    approved_at: 2026-08-11
+    based_on: [DOC-012@624f89339cb99160d19824cc589d59d98d5b5529]
+    note: "logo files added to assets/brand/, PNG only, no SVG source; OptiBudget Teal as sole brand colour"
