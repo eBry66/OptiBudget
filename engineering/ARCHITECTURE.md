@@ -58,7 +58,11 @@ apply at all; Supabase's own client is built around exactly this pattern
 (PostgREST requests carrying the caller's JWT) and doesn't need that
 extra wiring reproduced and kept correct by hand. `service_role` is reserved
 for out-of-band administrative scripts, never for a code path that serves a
-request, per `orchestration/HITL_GUIDE.md` §8.4.
+request, per REQ-004 and `orchestration/PROJECT_RULES.md`'s Highest-risk
+area section. That includes creating a
+household in the first place: bootstrapping a new household never falls
+back to `service_role` either — see Access control's household bootstrap
+mechanism below.
 
 ## Application structure
 
@@ -114,37 +118,153 @@ releases extend — it is the full shape, present from the start:
   through REQ-018)
 - `imports` — one row per import action, carrying the counts REQ-019
   requires and the coverage-date advance REQ-022 requires
-- `categories` (parent and leaf, REQ-031) and `household_category_settings`
-  — reducibility and provisioning are per household per leaf category
-  (REQ-039 through REQ-041), so they cannot live on the shared `categories`
-  row itself
+- Categories are two tables, not one, because REQ-038 gives leaf categories
+  two different owners:
+  - `categories` — the parent/leaf set OptiBudget itself provides
+    (REQ-031). No `household_id`: this is shared reference data, readable
+    by every household, not household-owned data.
+  - `household_categories` — leaf categories a household adds itself
+    (REQ-038), each under an existing parent. Carries `household_id` and is
+    RLS-scoped like any other household-owned table.
+  - Every other place in the schema that points at "a leaf category" —
+    `movements.category` (REQ-032, REQ-033, since a transaction is a
+    movement) and `household_category_settings` below — resolves across
+    the two tables the same explicit way: two nullable foreign key
+    columns, `category_id` (→ `categories.id`) and `household_category_id`
+    (→ `household_categories.id`), with a database-enforced check
+    constraint — `CHECK ((category_id IS NULL) <> (household_category_id
+    IS NULL))` — requiring exactly one of the two to be non-null on both
+    `movements` and `household_category_settings`. Postgres rejects a row
+    violating this at write time; it is not a convention left for
+    application code to honour. Never both, never neither.
+  - `household_category_settings` — the reducibility and provisioning a
+    household has set (REQ-039 through REQ-041), one row per household per
+    leaf category, using that same `category_id` / `household_category_id`
+    pair to identify which leaf category — system-provided or
+    household-created — the row belongs to
 
 **Release 2 additions:** `provision_targets`, `contingency_targets`
-(REQ-045 through REQ-051); `syndic_statements`, `charge_settlements`,
-`fund_contributions` (REQ-052 through REQ-059).
+(REQ-045 through REQ-051); `co_ownerships` — one row per co-ownership a
+household's property belongs to (`product/GLOSSARY.md`'s term), household
+data with `household_id` direct; `syndic_statements`, `charge_settlements`,
+`fund_contributions` (REQ-052 through REQ-059), each referencing
+`co_ownership_id` rather than a household or an account directly (see
+Access control for the reach path).
 
-**Release 3 additions:** `securities`, `positions`, `security_transactions`,
-`valuations`, `investment_income` (REQ-060 through REQ-073).
+**Release 3 additions:** `securities`, `positions` (REQ-060 through
+REQ-062); `security_transactions` — one row per buy or sell (REQ-061),
+referencing `position_id`; `valuations` — one row per valuation of a
+security (REQ-066, REQ-067), referencing `security_id`; `investment_income`
+— one row per income event on a position (REQ-063), referencing
+`position_id` (see Access control for how each of the three reaches a
+household).
 
-**Currency, across every release.** Any table holding an amount that can
-originate outside the euro — `movements`, `valuations`,
-`security_transactions`, `investment_income` — stores the source amount and
-its source currency alongside the derived euro amount, plus the exchange
-rate and the date it applied to, wherever a conversion happened (REQ-074
+**Currency, across every release.** REQ-075 names three sources of a
+non-euro amount — a bank, a syndic, or a market — not only a bank. Any
+table holding an amount that can originate from one of those three —
+`movements`, `reference_balances` (bank); `syndic_statements`,
+`charge_settlements`, `fund_contributions` (syndic); `valuations`,
+`security_transactions`, `investment_income` (market) — stores the source
+amount and its source currency alongside the derived euro amount, plus the
+exchange rate and the date it applied to, wherever a conversion happened (REQ-074
 through REQ-077). No table stores a converted figure without also storing
 what it was converted from.
 
 ## Access control
 
 The highest-risk area, per `orchestration/PROJECT_RULES.md`. Every table
-above that carries or reaches household data — directly via a
-`household_id` column, or indirectly via an `account_id` that resolves to
-one — carries a Row Level Security policy restricting its rows to
-households the requesting user reaches through `household_members`, and no
-other path. No role bypasses this (REQ-004): the design has no
-administrative surface that reads across households, because there is no
-code path, anywhere a request is served, that uses the `service_role` key
-instead of the caller's own session.
+below carries a Row Level Security policy restricting its rows to
+households the requesting user reaches through `household_members`. No
+role bypasses this (REQ-004): the design has no administrative surface
+that reads across households, because there is no code path, anywhere a
+request is served, that uses the `service_role` key instead of the
+caller's own session.
+
+**Reaching a household, per table.** Not every table below reaches one the
+same way, so each row states the exact column or join chain used, rather
+than a blanket rule that would hide the ones that don't fit it.
+
+| Table | Reaches a household via |
+|---|---|
+| `households` | is the household |
+| `household_members` | `household_id` (direct); insertable only through `create_household()`, below |
+| `accounts` | `household_id` (direct) |
+| `reference_balances` | `account_id` → `accounts.household_id` |
+| `movements` | `account_id` → `accounts.household_id` |
+| `transfer_candidates`, `transfers` | both linked movements' `account_id` → `accounts.household_id` (REQ-025 guarantees both accounts belong to the same household); a migration should denormalise `household_id` onto these two tables so the RLS policy is one equality check rather than two joins through `movements` |
+| `duplicate_candidates` | `account_id` → `accounts.household_id` (the account the candidate was raised against) |
+| `imports` | `account_id` → `accounts.household_id` |
+| `categories` | none — global reference data, not household data; no RLS household policy |
+| `household_categories` | `household_id` (direct) |
+| `household_category_settings` | `household_id` (direct) |
+| `provision_targets`, `contingency_targets` | `household_id` (direct) |
+| `co_ownerships` | `household_id` (direct). Not previously listed in the Data model section above — required by the next row: `syndic_statements`, `charge_settlements`, and `fund_contributions` belong to a co-ownership (`product/GLOSSARY.md`'s term for the legal association a syndic administers), not to a household directly, and no `account_id` reaches them either. `product/PRODUCT.md`'s "not a portfolio of properties" constraint means a household has at most one co-ownership in version 1, but the relationship is still its own row rather than collapsed onto `households`, since a charge settlement's "co-ownership's financial year" (REQ-054, REQ-055) is a property of the co-ownership, not borrowed from the household |
+| `syndic_statements` | `co_ownership_id` → `co_ownerships.household_id` |
+| `charge_settlements` | `co_ownership_id` → `co_ownerships.household_id` — a settlement is stated for a co-ownership financial year (REQ-054), not for one particular `syndic_statements` row, so it references the co-ownership directly rather than through a statement |
+| `fund_contributions` | `co_ownership_id` → `co_ownerships.household_id`; may additionally reference the `movement_id` that paid it (AC-058), which resolves to the same household independently via `accounts.household_id` |
+| `securities` | `household_id` (direct) — treated as the household's own record rather than shared market data, since version 1 has no shared security master-data feed and a shared writable table would itself be a cross-household channel |
+| `positions` | one row per security held in one securities account (REQ-060), referencing `account_id` and `security_id`. Reaches a household via `account_id` → `accounts.household_id`; `security_id` → `securities.household_id` must agree — a position can't exist for a security and an account belonging to different households |
+| `security_transactions` | one row per buy or sell (REQ-061), referencing `position_id`. Reaches a household via `position_id` → `positions.account_id` → `accounts.household_id` |
+| `valuations` | one row per valuation of a security (REQ-066, REQ-067), referencing `security_id`. Reaches a household via `security_id` → `securities.household_id` directly — a valuation is of a security, not of an account or a position |
+| `investment_income` | one row per income event on a position (REQ-063), referencing `position_id`. Reaches a household via `position_id` → `positions.account_id` → `accounts.household_id`, the same two-hop path as `security_transactions` |
+
+`engineering/THREAT_MODEL.md` (DOC-016) writes the actual policy for each
+row above; this table is what makes that a checklist instead of a blank
+page, including the `co_ownerships` table this document adds here so the
+syndic-related rows are resolvable at all, and the structure stated inline
+for `valuations`, `security_transactions`, and `investment_income`, which
+had no entity definition anywhere else in this document to point back to.
+
+**Household bootstrap.** Creating a household's first `household_members`
+row is the one case where an ordinary authenticated user must succeed at a
+write that no membership-based RLS policy on `household_members` can
+authorise — there is no membership row yet for such a policy to check
+against. This is solved with a single Postgres function, not with elevated
+application credentials:
+
+```sql
+CREATE FUNCTION create_household(household_name text)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  new_household_id uuid;
+BEGIN
+  INSERT INTO households (name) VALUES (household_name)
+    RETURNING id INTO new_household_id;
+  INSERT INTO household_members (household_id, user_id)
+    VALUES (new_household_id, auth.uid());
+  RETURN new_household_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION create_household(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION create_household(text) TO authenticated;
+```
+
+Called through Supabase's RPC interface with the caller's ordinary
+session, so from the application's perspective this is a normal
+RLS-respecting request, not a `service_role` escape hatch. The function
+takes no `user_id` or `household_id` parameter that could target someone
+else's row: it always inserts for `auth.uid()` — the identity Postgres
+already knows from the caller's JWT — and it always creates a brand-new
+household, never attaching the caller to an existing one.
+`household_members` itself carries no INSERT policy for ordinary
+RLS-scoped queries at all; the only way a row ever enters it is through
+this function's elevated context, never through a bare `INSERT` a client
+sends directly. `households` carries the same guarantee, stated explicitly
+rather than left implicit: it too has no INSERT policy for ordinary
+RLS-scoped queries, so a bare `INSERT` cannot create a `households` row
+outside this function either. Without that guarantee an authenticated
+caller could still create an orphan `households` row directly — low
+severity, since a household with no matching `household_members` row is
+unreachable under RLS to anyone, including its own creator, so it grants no
+access to anything — but this document states the restriction outright
+rather than relying on that low severity to excuse leaving it unstated.
+This is the concrete mechanism `engineering/THREAT_MODEL.md` (DOC-016)
+audits — not a gap left for that document to invent.
 
 The exact policy per table is `engineering/THREAT_MODEL.md`'s job (DOC-016,
 which depends on this document). What this document fixes is that the
@@ -198,6 +318,15 @@ THREAT_MODEL.md` or `engineering/TESTING.md` the way the items in Stack are.
 
 ## Out of scope for this document
 
+- Mortgage tracking. `product/PRODUCT.md` names it as core to the second
+  user — the couple carrying a mortgage — and lists it among the seven
+  fundamentals. `product/REQUIREMENTS.md` defines no REQ id for it: there
+  is nothing there a mortgage entity could be built against. This is a gap
+  in the product phase, not an engineering decision, so this document
+  defines no mortgage entity, no mortgage schema, and no mortgage
+  behaviour — guessing its shape from PRODUCT.md's one paragraph would mean
+  inventing a requirement, which `AGENTS.md` forbids. Mortgage support
+  waits until `product/REQUIREMENTS.md` states what it must do.
 - REQ-088 and REQ-089 (English, Dutch, and switching between languages) are
   out of scope for version 1 per `product/SCOPE.md`. No i18n library is
   adopted now; French strings are written directly. Adopting one ahead of a
