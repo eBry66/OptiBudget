@@ -154,8 +154,9 @@ data with `household_id` direct; `syndic_statements`, `charge_settlements`,
 `co_ownership_id` rather than an account directly; `fund_contributions` also
 carries denormalised `household_id` (see Access control for the reach path).
 
-**Release 3 additions:** `securities`, `positions` (REQ-060 through
-REQ-062); `security_transactions` — one row per buy or sell (REQ-061),
+**Release 3 additions:** `securities` and `positions`, each carrying
+`household_id` (REQ-060 through REQ-062); `security_transactions` — one row
+per buy or sell (REQ-061),
 referencing `position_id`; `valuations` — one row per valuation of a
 security (REQ-066, REQ-067), referencing `security_id`; `investment_income`
 — one row per income event on a position (REQ-063), referencing
@@ -169,8 +170,9 @@ an implementation detail of its constraints. `household_category_settings`
 already carries its own direct `household_id`, so it needs no additional
 column. The earlier entity entries did not declare the composite parent keys
 either: this rule also adds unique `(id, household_id)` constraints to
-`accounts`, `household_categories`, `co_ownerships`, and `movements`, which
-are the parent keys the composite foreign keys below require.
+`accounts`, `household_categories`, `co_ownerships`, `movements`, and
+`securities`, which are the parent keys the composite foreign keys below
+require.
 
 Postgres then enforces household agreement at write time with composite
 foreign keys. `movements` uses `(account_id, household_id)` to reference
@@ -200,9 +202,10 @@ what it was converted from.
 ## Access control
 
 The highest-risk area, per `orchestration/PROJECT_RULES.md`. Every table
-below carries a Row Level Security policy restricting its rows to
-households the requesting user reaches through `household_members`. No
-role serving a request bypasses this (REQ-004): the design has no
+below that carries or reaches household data carries a Row Level Security
+policy restricting its rows to households the requesting user reaches
+through `household_members`. No role serving a request bypasses this
+(REQ-004): the design has no
 administrative surface that reads across households, because there is no code
 path, anywhere a request is served, that uses the `service_role` key instead
 of the caller's own session.
@@ -217,8 +220,8 @@ than a blanket rule that would hide the ones that don't fit it.
 | `household_members` | `household_id` (direct); insertable only through `create_household()`, below |
 | `accounts` | `household_id` (direct) |
 | `reference_balances` | `account_id` → `accounts.household_id` |
-| `movements` | `account_id` → `accounts.household_id` |
-| `transfer_candidates`, `transfers` | both linked movements' `account_id` → `accounts.household_id` (REQ-025 guarantees both accounts belong to the same household); a migration should denormalise `household_id` onto these two tables so the RLS policy is one equality check rather than two joins through `movements` |
+| `movements` | `household_id` (direct), enforced to agree with `account_id` by the composite foreign key stated above |
+| `transfer_candidates`, `transfers` | `household_id` (direct), required on both tables and enforced to agree with each linked movement by the composite foreign keys stated above |
 | `duplicate_candidates` | `account_id` → `accounts.household_id` (the account the candidate was raised against) |
 | `imports` | `account_id` → `accounts.household_id` |
 | `categories` | none — global reference data, not household data; no RLS household policy |
@@ -230,7 +233,7 @@ than a blanket rule that would hide the ones that don't fit it.
 | `charge_settlements` | `co_ownership_id` → `co_ownerships.household_id` — a settlement is stated for a co-ownership financial year (REQ-054), not for one particular `syndic_statements` row, so it references the co-ownership directly rather than through a statement |
 | `fund_contributions` | `co_ownership_id` → `co_ownerships.household_id`; may additionally reference the `movement_id` that paid it (AC-058), which resolves to the same household independently via `accounts.household_id` |
 | `securities` | `household_id` (direct) — treated as the household's own record rather than shared market data, since version 1 has no shared security master-data feed and a shared writable table would itself be a cross-household channel |
-| `positions` | one row per security held in one securities account (REQ-060), referencing `account_id` and `security_id`. Reaches a household via `account_id` → `accounts.household_id`; `security_id` → `securities.household_id` must agree — a position can't exist for a security and an account belonging to different households |
+| `positions` | `household_id` (direct), on one row per security held in one securities account (REQ-060). A unique `(id, household_id)` constraint on `securities` supplies the second composite parent key alongside the one already required on `accounts`; `(account_id, household_id)` references `accounts` and `(security_id, household_id)` references `securities`, so Postgres rejects a position whose account and security belong to different households |
 | `security_transactions` | one row per buy or sell (REQ-061), referencing `position_id`. Reaches a household via `position_id` → `positions.account_id` → `accounts.household_id` |
 | `valuations` | one row per valuation of a security (REQ-066, REQ-067), referencing `security_id`. Reaches a household via `security_id` → `securities.household_id` directly — a valuation is of a security, not of an account or a position |
 | `investment_income` | one row per income event on a position (REQ-063), referencing `position_id`. Reaches a household via `position_id` → `positions.account_id` → `accounts.household_id`, the same two-hop path as `security_transactions` |
