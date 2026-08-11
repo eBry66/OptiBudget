@@ -59,10 +59,12 @@ apply at all; Supabase's own client is built around exactly this pattern
 extra wiring reproduced and kept correct by hand. `service_role` is reserved
 for out-of-band administrative scripts, never for a code path that serves a
 request, per REQ-004 and `orchestration/PROJECT_RULES.md`'s Highest-risk
-area section. That includes creating a
-household in the first place: bootstrapping a new household never falls
-back to `service_role` either — see Access control's household bootstrap
-mechanism below.
+area section. Those scripts are prohibited from creating `households` or
+`household_members` rows directly; household creation always uses the
+function below with the member's authenticated session. That includes
+creating a household in the first place: bootstrapping a new household never
+falls back to `service_role` either — see Access control's household
+bootstrap mechanism below.
 
 ## Application structure
 
@@ -113,9 +115,10 @@ releases extend — it is the full shape, present from the start:
   must.
 - `accounts` (role: spending, provision, contingency, or securities —
   REQ-005), `reference_balances` (REQ-008)
-- `movements` (REQ-013, REQ-023, REQ-024), `transfer_candidates` and
-  `transfers` (REQ-025 through REQ-030), `duplicate_candidates` (REQ-016
-  through REQ-018)
+- `movements` (REQ-013, REQ-023, REQ-024), carrying denormalised
+  `household_id`; `transfer_candidates` and `transfers` (REQ-025 through
+  REQ-030), each carrying denormalised `household_id`; `duplicate_candidates`
+  (REQ-016 through REQ-018)
 - `imports` — one row per import action, carrying the counts REQ-019
   requires and the coverage-date advance REQ-022 requires
 - Categories are two tables, not one, because REQ-038 gives leaf categories
@@ -148,8 +151,8 @@ releases extend — it is the full shape, present from the start:
 household's property belongs to (`product/GLOSSARY.md`'s term), household
 data with `household_id` direct; `syndic_statements`, `charge_settlements`,
 `fund_contributions` (REQ-052 through REQ-059), each referencing
-`co_ownership_id` rather than a household or an account directly (see
-Access control for the reach path).
+`co_ownership_id` rather than an account directly; `fund_contributions` also
+carries denormalised `household_id` (see Access control for the reach path).
 
 **Release 3 additions:** `securities`, `positions` (REQ-060 through
 REQ-062); `security_transactions` — one row per buy or sell (REQ-061),
@@ -158,6 +161,30 @@ security (REQ-066, REQ-067), referencing `security_id`; `investment_income`
 — one row per income event on a position (REQ-063), referencing
 `position_id` (see Access control for how each of the three reaches a
 household).
+
+**Cross-household reference integrity.** This rule adds a denormalised
+`household_id` column to `movements`, `transfer_candidates`, `transfers`, and
+`fund_contributions`; those columns are part of the logical model, not merely
+an implementation detail of its constraints. `household_category_settings`
+already carries its own direct `household_id`, so it needs no additional
+column. The earlier entity entries did not declare the composite parent keys
+either: this rule also adds unique `(id, household_id)` constraints to
+`accounts`, `household_categories`, `co_ownerships`, and `movements`, which
+are the parent keys the composite foreign keys below require.
+
+Postgres then enforces household agreement at write time with composite
+foreign keys. `movements` uses `(account_id, household_id)` to reference
+`accounts` and, when `household_category_id` is set, uses
+`(household_category_id, household_id)` to reference
+`household_categories`; `household_category_settings` uses the same
+composite reference when its `household_category_id` is set.
+`transfer_candidates` and `transfers` use their denormalised `household_id`
+in a composite foreign key to each linked movement. `fund_contributions`
+uses `(co_ownership_id, household_id)` to reference `co_ownerships` and,
+when `movement_id` is set, uses `(movement_id, household_id)` to reference
+that movement. These are database constraints, not application conventions;
+a write whose parents resolve to different households is rejected. This is
+the same enforced agreement required for a position's account and security.
 
 **Currency, across every release.** REQ-075 names three sources of a
 non-euro amount — a bank, a syndic, or a market — not only a bank. Any
@@ -175,10 +202,10 @@ what it was converted from.
 The highest-risk area, per `orchestration/PROJECT_RULES.md`. Every table
 below carries a Row Level Security policy restricting its rows to
 households the requesting user reaches through `household_members`. No
-role bypasses this (REQ-004): the design has no administrative surface
-that reads across households, because there is no code path, anywhere a
-request is served, that uses the `service_role` key instead of the
-caller's own session.
+role serving a request bypasses this (REQ-004): the design has no
+administrative surface that reads across households, because there is no code
+path, anywhere a request is served, that uses the `service_role` key instead
+of the caller's own session.
 
 **Reaching a household, per table.** Not every table below reaches one the
 same way, so each row states the exact column or join chain used, rather
@@ -198,7 +225,7 @@ than a blanket rule that would hide the ones that don't fit it.
 | `household_categories` | `household_id` (direct) |
 | `household_category_settings` | `household_id` (direct) |
 | `provision_targets`, `contingency_targets` | `household_id` (direct) |
-| `co_ownerships` | `household_id` (direct). Not previously listed in the Data model section above — required by the next row: `syndic_statements`, `charge_settlements`, and `fund_contributions` belong to a co-ownership (`product/GLOSSARY.md`'s term for the legal association a syndic administers), not to a household directly, and no `account_id` reaches them either. `product/PRODUCT.md`'s "not a portfolio of properties" constraint means a household has at most one co-ownership in version 1, but the relationship is still its own row rather than collapsed onto `households`, since a charge settlement's "co-ownership's financial year" (REQ-054, REQ-055) is a property of the co-ownership, not borrowed from the household |
+| `co_ownerships` | `household_id` (direct). Required by the next row: `syndic_statements`, `charge_settlements`, and `fund_contributions` belong to a co-ownership (`product/GLOSSARY.md`'s term for the legal association a syndic administers), not to a household directly, and no `account_id` reaches them either. `product/PRODUCT.md`'s "not a portfolio of properties" constraint means a household has at most one co-ownership in version 1, but the relationship is still its own row rather than collapsed onto `households`, since a charge settlement's "co-ownership's financial year" (REQ-054, REQ-055) is a property of the co-ownership, not borrowed from the household |
 | `syndic_statements` | `co_ownership_id` → `co_ownerships.household_id` |
 | `charge_settlements` | `co_ownership_id` → `co_ownerships.household_id` — a settlement is stated for a co-ownership financial year (REQ-054), not for one particular `syndic_statements` row, so it references the co-ownership directly rather than through a statement |
 | `fund_contributions` | `co_ownership_id` → `co_ownerships.household_id`; may additionally reference the `movement_id` that paid it (AC-058), which resolves to the same household independently via `accounts.household_id` |
@@ -222,19 +249,24 @@ authorise — there is no membership row yet for such a policy to check
 against. This is solved with a single Postgres function, not with elevated
 application credentials:
 
+Because this function runs as its owner, it uses an empty `search_path` and
+schema-qualifies every object it references. This is the safe
+`SECURITY DEFINER` pattern: PostgreSQL cannot resolve an unqualified name to
+an attacker-controlled object in a writable schema such as `public`.
+
 ```sql
 CREATE FUNCTION create_household(household_name text)
 RETURNS uuid
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   new_household_id uuid;
 BEGIN
-  INSERT INTO households (name) VALUES (household_name)
+  INSERT INTO public.households (name) VALUES (household_name)
     RETURNING id INTO new_household_id;
-  INSERT INTO household_members (household_id, user_id)
+  INSERT INTO public.household_members (household_id, user_id)
     VALUES (new_household_id, auth.uid());
   RETURN new_household_id;
 END;
@@ -252,9 +284,12 @@ else's row: it always inserts for `auth.uid()` — the identity Postgres
 already knows from the caller's JWT — and it always creates a brand-new
 household, never attaching the caller to an existing one.
 `household_members` itself carries no INSERT policy for ordinary
-RLS-scoped queries at all; the only way a row ever enters it is through
-this function's elevated context, never through a bare `INSERT` a client
-sends directly. `households` carries the same guarantee, stated explicitly
+RLS-scoped queries at all; the only way a row enters it through
+request-serving application code is through this function's elevated
+context, never through a bare `INSERT` a client sends directly.
+Out-of-band administrative scripts are likewise prohibited from inserting
+`household_members` or `households` rows directly with `service_role`.
+`households` carries the same request-serving guarantee, stated explicitly
 rather than left implicit: it too has no INSERT policy for ordinary
 RLS-scoped queries, so a bare `INSERT` cannot create a `households` row
 outside this function either. Without that guarantee an authenticated
