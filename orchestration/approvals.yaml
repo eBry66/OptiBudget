@@ -304,3 +304,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9, DOC-016@1db7c66151eff94e710102e48737542149dcf600]
     note: "in use since DOC-015 review, no changes needed"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 3f1da34633c99cb0da551d8a6d5e4986a5dc14ad
+    approved_at: 2026-08-12
+    based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
+    note: "fixes stale-active-document bug: agents were inferring current item from newest handoff file alone, without checking approvals.yaml"
