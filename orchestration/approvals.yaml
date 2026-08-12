@@ -370,3 +370,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
     note: "final gate 0 re-read per HITL_GUIDE §10 exit checklist; no content change"
+  - id: DOC-024
+    path: project.state.yaml
+    commit: ad038926bfcc908a5b2ed5c26b4d79e36b0e456d
+    approved_at: 2026-08-12
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9, DOC-014@38ae74e662d50e0e665e61787778ec1abe1ae8a3, DOC-019@20e8270fcd351363228f8b53d319e0ddd3633f90, DOC-020@e1ba1b85a7fd65d17f33e78c0e857972691648f4, DOC-021@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-022@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-023@4e80fd1de94f5133789de0d6eed68ec2f61050aa, DOC-025@2ba7fc9eb18b67c22f568e9fcc1a36d07eb91ca4]
+    note: "gate 0 complete: all documents approved, STALE_REPORT.md clean"
