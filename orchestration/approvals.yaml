@@ -310,3 +310,39 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
     note: "fixes stale-active-document bug: agents were inferring current item from newest handoff file alone, without checking approvals.yaml"
+  - id: DOC-005
+    path: CLAUDE.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-006
+    path: .codex/config.toml
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-007
+    path: .claude/settings.json
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-008
+    path: product/PRODUCT.md
+    commit: 33acf83670c95fa774e1e40d6959247593964ea6
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad]
+    note: "cascade from DOC-004; no content change"
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    commit: 4e80fd1de94f5133789de0d6eed68ec2f61050aa
+    approved_at: 2026-08-12
+    based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "cascade from DOC-004; no content change"
