@@ -358,3 +358,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-017@4e80fd1de94f5133789de0d6eed68ec2f61050aa, DOC-018@c068db5475208bb7702d074c23df93f0bbfb7420]
     note: "unit partial (missing check-coverage.mjs), validate-state and validate-task not yet defined by design - revision trigger recorded for task-001"
+  - id: DOC-019
+    path: .env.example
+    commit: 20e8270fcd351363228f8b53d319e0ddd3633f90
+    approved_at: 2026-08-12
+    based_on: [DOC-016@1db7c66151eff94e710102e48737542149dcf600]
+    note: "Codex review: no violations found. Publishable-key naming independently verified against Supabase's live docs before review."
