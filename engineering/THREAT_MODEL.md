@@ -512,11 +512,10 @@ decisions this document audits rather than invents:
 - **Server Actions as the only mutation path.** `engineering/
   ARCHITECTURE.md`'s "Application structure" section commits every
   household mutation to a Next.js Server Action rather than a separate API
-  layer. Server Actions carry origin-header verification against
-  cross-site request forgery as a property of the framework Stack already
-  chose; a hand-rolled API layer would have needed that reproduced by
-  hand and kept correct, which is one more reason ARCHITECTURE.md gave for
-  not building one.
+  layer. [Next.js's Data Security guide](https://nextjs.org/docs/app/guides/data-security)
+  documents that Server Actions compare the request's Origin header with
+  its Host header as additional protection against cross-site request
+  forgery.
 - **CSV import stays inside the household it was uploaded to.** CSV
   parsing runs inside the importing household's own Server Action call
   (REQ-013, REQ-014), under that household's own RLS-scoped session. A
