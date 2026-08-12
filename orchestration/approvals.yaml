@@ -346,3 +346,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-004@3f1da34633c99cb0da551d8a6d5e4986a5dc14ad, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "cascade from DOC-004; no content change"
+  - id: DOC-018
+    path: package.json
+    commit: c068db5475208bb7702d074c23df93f0bbfb7420
+    approved_at: 2026-08-12
+    based_on: [DOC-015@60000ab01fac982a733344013cf46585e394b54a]
+    note: "Codex review: no violations found, including Next 16.3.0 Server Actions check against ARCHITECTURE.md"
