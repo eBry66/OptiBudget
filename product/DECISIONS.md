@@ -97,6 +97,8 @@ added later, the household will need to be able to disagree with a category's
 reducibility for its own reasons — which is already possible under the decision
 above.
 
+---
+
 ## 2026-08-11 — Staff cross-household access stays out of scope; REQ-004 remains absolute
 
 **Decided:** OptiBudget has no role, mechanism, or credential capable of
@@ -131,3 +133,32 @@ household's behalf — not before. If adopted then, it needs its own REQ id
 in `product/REQUIREMENTS.md`, stating explicitly: who can authorize it,
 what triggers it, how a household would know, and where the audit record
 lives — with the same rigor as every other requirement, not a retrofit.
+
+---
+
+## 2026-08-12 — Renaming a household and removing a member are out of scope for version 1
+
+**Decided:** version 1 ships with no way for a household to rename itself or
+remove a member. `engineering/THREAT_MODEL.md` (DOC-016) reflects this
+directly: `households` and `household_members` carry no `UPDATE` or `DELETE`
+policy, because no `REQ` id in `product/REQUIREMENTS.md` describes either
+action.
+
+**Why:** the gap surfaced during `DOC-016` review, not from a deliberate
+product decision made earlier. `product/GLOSSARY.md` already notes version 1
+ships exactly one member per household in practice, which is why the absence
+went unnoticed through `REQUIREMENTS.md`, `SCOPE.md`, and `ACCEPTANCE.md`.
+Writing a policy for either action now, without a requirement behind it,
+would mean inventing the requirement inside an engineering document, which
+`AGENTS.md` forbids.
+
+**Rules out:** treating this as a defect to fix in `engineering/
+THREAT_MODEL.md`. The document is correct as drafted; the gap is upstream,
+in the product phase, and belongs there when it is addressed.
+
+**Revisit when:** `product/REQUIREMENTS.md` is next opened for the household
+management area — expected at the version 2 planning pass for the couple-
+with-mortgage user, per `product/PRODUCT.md`. At that point this needs: a
+REQ id for renaming a household, a REQ id for removing a member (including
+what happens to that member's data and any remaining member's access), and
+the corresponding `UPDATE` / `DELETE` policies added to `engineering/THREAT_MODEL.md`.
