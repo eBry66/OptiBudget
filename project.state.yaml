@@ -1,0 +1,14 @@
+version: 1
+gate: 1
+active_task: task-001
+attempt: 1
+authorized_branch: task-001-ci-and-validators
+allowed_paths:
+  - .github/workflows/
+  - scripts/
+  - tests/
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+frozen: false
