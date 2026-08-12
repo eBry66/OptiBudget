@@ -352,3 +352,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-015@60000ab01fac982a733344013cf46585e394b54a]
     note: "Codex review: no violations found, including Next 16.3.0 Server Actions check against ARCHITECTURE.md"
+  - id: DOC-020
+    path: engineering/CHECK_MAP.md
+    commit: e1ba1b85a7fd65d17f33e78c0e857972691648f4
+    approved_at: 2026-08-12
+    based_on: [DOC-017@4e80fd1de94f5133789de0d6eed68ec2f61050aa, DOC-018@c068db5475208bb7702d074c23df93f0bbfb7420]
+    note: "unit partial (missing check-coverage.mjs), validate-state and validate-task not yet defined by design - revision trigger recorded for task-001"
