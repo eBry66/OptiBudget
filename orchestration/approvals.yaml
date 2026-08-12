@@ -298,3 +298,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-015@60000ab01fac982a733344013cf46585e394b54a]
     note: "2 review rounds: 3 findings withdrawn (composite FK equivalence), 1 fixed (CSRF attribution corrected, cites Next.js docs directly)"
+  - id: DOC-021
+    path: orchestration/REVIEW_BRIEF.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-12
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9, DOC-016@1db7c66151eff94e710102e48737542149dcf600]
+    note: "in use since DOC-015 review, no changes needed"
