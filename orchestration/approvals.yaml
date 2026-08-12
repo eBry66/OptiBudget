@@ -364,3 +364,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-016@1db7c66151eff94e710102e48737542149dcf600]
     note: "Codex review: no violations found. Publishable-key naming independently verified against Supabase's live docs before review."
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 3f1da34633c99cb0da551d8a6d5e4986a5dc14ad
+    approved_at: 2026-08-12
+    based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
+    note: "final gate 0 re-read per HITL_GUIDE §10 exit checklist; no content change"
