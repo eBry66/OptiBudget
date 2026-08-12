@@ -292,3 +292,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-12
     based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "household rename/member removal deferred to v2, gap found during DOC-016 review"
+  - id: DOC-016
+    path: engineering/THREAT_MODEL.md
+    commit: 1db7c66151eff94e710102e48737542149dcf600
+    approved_at: 2026-08-12
+    based_on: [DOC-015@60000ab01fac982a733344013cf46585e394b54a]
+    note: "2 review rounds: 3 findings withdrawn (composite FK equivalence), 1 fixed (CSRF attribution corrected, cites Next.js docs directly)"
