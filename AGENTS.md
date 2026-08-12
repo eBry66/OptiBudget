@@ -9,10 +9,16 @@ here. Project-specific rules live in `orchestration/PROJECT_RULES.md`.
 ## Read before doing anything
 1. This file.
 2. orchestration/PROJECT_RULES.md
-3. project.state.yaml, if it exists. During gate 0 it does not.
-4. orchestration/bootstrap.yaml
-5. The task file named by project.state.yaml, if any.
-6. The newest file in orchestration/handoffs/ for the current item.
+3. orchestration/approvals.yaml, to determine which documents are actually
+   approved. bootstrap.yaml alone states the dependency graph, not approval
+   state, and is not sufficient on its own to identify the current item.
+4. project.state.yaml, if it exists. During gate 0 it does not.
+5. orchestration/bootstrap.yaml
+6. The task file named by project.state.yaml, if any.
+7. The newest file in orchestration/handoffs/ that matches the current
+   item as determined by steps 3-5 above — not simply the most recently
+   modified file in that folder, since a handoff for an already-approved
+   document can be newer than one for the document now active.
 
 Then state back to the HITL: current gate, active DOC id or task id, the paths
 you may write to, and the single next action. Quote the SENTINEL line from
