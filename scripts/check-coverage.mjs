@@ -34,6 +34,10 @@ function walk(dir) {
   if (!existsSync(dir)) return [];
   const out = [];
   for (const entry of readdirSync(dir)) {
+    // tests/fixtures/ holds deliberately broken inputs for this task's own
+    // fixture tests, not application test files - scanning it would count
+    // those fixtures as (mis)covering real AC ids.
+    if (entry === 'fixtures') continue;
     const full = join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) out.push(...walk(full));
