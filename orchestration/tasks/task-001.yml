@@ -1,0 +1,67 @@
+id: task-001
+branch: task-001-ci-and-validators
+attempt: 1
+description: >
+  Build the enforcement machinery gate 1 depends on: CI, the two
+  validators, coverage-check wiring, and fixture tests proving each
+  validator can actually fail.
+
+allowed_paths:
+  - .github/workflows/
+  - scripts/
+  - tests/
+
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+
+deliverables:
+  - path: scripts/validate-state.mjs
+    description: >
+      Validates project.state.yaml against the shape in HITL_GUIDE.md
+      §4.12: required keys (version, gate, active_task, attempt,
+      authorized_branch, allowed_paths, required_checks, frozen) are
+      present; gate and attempt are integers; frozen is a boolean;
+      allowed_paths and required_checks are non-empty lists. Exits
+      non-zero on any violation.
+
+  - path: scripts/validate-task.mjs
+    description: >
+      Validates that a task YAML's allowed_paths is a subset of
+      project.state.yaml's allowed_paths, and that every file the task's
+      diff touches falls within the task YAML's own allowed_paths. Exits
+      non-zero on any violation.
+
+  - path: scripts/check-coverage.mjs
+    description: >
+      Fails when an AC id in product/ACCEPTANCE.md has no matching test,
+      per the naming contract in engineering/TESTING.md: test file name
+      tests/<area>/AC-0NN.<slug>.test.ts, test title prefixed [AC-0NN].
+
+  - path: .github/workflows/ci.yml
+    description: >
+      Runs validate-state and validate-task directly, and a unit check
+      whose npm script chains `vitest run && node
+      scripts/check-coverage.mjs`. Three checks, matching required_checks
+      above exactly — no fourth entry is added to project.state.yaml.
+
+  - path: tests/
+    description: >
+      Fixture tests proving each of the three validators above fails on a
+      deliberately broken input (malformed project.state.yaml, a task
+      YAML whose allowed_paths escapes project.state.yaml's, an AC id
+      with no matching test). A validator never seen to fail is not
+      evidence of anything (HITL_GUIDE.md §10).
+
+review:
+  procedure: >
+    HITL_GUIDE.md §7 steps 1-5: the implementing vendor drafts this task
+    YAML and its deliverables; a different vendor reviews both against
+    the prerequisite documents named above and reports violations only.
+  acceptance: >
+    HITL_GUIDE.md §15, not §5 — pull request, CI, and HITL manual review
+    against the Vercel-less local/CI evidence available at this stage.
+    This task YAML and its deliverables are never entered in
+    orchestration/approvals.yaml and are never approved with
+    `next.mjs approve`.
