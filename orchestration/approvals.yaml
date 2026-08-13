@@ -424,3 +424,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-13
     based_on: [DOC-004@553bcacf542290b76cc0805bcc213ef590aae7d0, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "cascade from DOC-004; no content change"
+  - id: DOC-010
+    path: product/DECISIONS.md
+    commit: f2535cf6ca4dd2022b9d86433fd055e3b041e2e6
+    approved_at: 2026-08-13
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "task-YAML authorship default logged: agent-drafted by default, HITL retention explicit, §15 not §5 governs acceptance"
