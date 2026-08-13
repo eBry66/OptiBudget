@@ -649,7 +649,7 @@ Part B. A two-column mapping from each name in `required_checks` to the exact np
 
 The prompt you paste to the reviewing vendor. It must name the diff to review, the documents to review it against, and require output as a list of violations with file and line — not a summary, not praise.
 
-## 7. Agent-Drafted Documents
+## 7. Agent-Drafted Documents and Tasks
 
 DOC-015, DOC-016, DOC-018, DOC-019 are drafted by a coder. Procedure:
 
@@ -663,6 +663,13 @@ DOC-015, DOC-016, DOC-018, DOC-019 are drafted by a coder. Procedure:
 The vendor that drafted a document must not review it [M]. That rule is the whole reason a second vendor exists.
 
 For DOC-016, THREAT_MODEL.md: the highest-risk item in this stack is Supabase Row Level Security [M]. If the drafted threat model does not discuss RLS policies per table, it is incomplete regardless of how long it is.
+
+From gate 1 onward, task YAMLs in `orchestration/tasks/` and the deliverables
+they name are agent-drafted and follow the same cross-vendor procedure by
+default. The HITL may explicitly retain authorship of a specific file. Unless
+the HITL does so, the implementing vendor drafts the task YAML when instructed,
+implements its deliverables, and a different vendor reviews both the task YAML
+and the implementation before the HITL decides whether to accept them.
 
 ## 8. GitHub, Vercel, Supabase
 
@@ -718,8 +725,13 @@ Then, in this order:
 
 1. Enable branch protection on `main` (section 8.1).
 2. Create branch `task-001-ci-and-validators`.
-3. Write `orchestration/tasks/task-001.yml` defining the deliverables: `.github/workflows/ci.yml`, `scripts/validate-state.mjs`, `scripts/validate-task.mjs`, `scripts/check-coverage.mjs`, and fixture tests that prove each validator fails on a deliberately broken input.
-4. Run task-001 through the section 7 procedure: one vendor implements, a different one reviews.
+3. Instruct the implementing vendor to draft `orchestration/tasks/task-001.yml`
+   defining the deliverables: `.github/workflows/ci.yml`,
+   `scripts/validate-state.mjs`, `scripts/validate-task.mjs`,
+   `scripts/check-coverage.mjs`, and fixture tests that prove each validator
+   fails on a deliberately broken input, then implement those deliverables.
+4. Run task-001 through the section 7 procedure: the implementing vendor drafts
+   the task YAML and deliverables, and a different vendor reviews both.
 
 Task-001 is the only task where the enforcement machinery does not yet protect you, because it is the machinery [M]. Read its diff more carefully than any other, and require the fixture tests — a validator that has never been seen to fail is not evidence of anything.
 
