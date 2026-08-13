@@ -84,6 +84,10 @@ function main() {
   if (!taskPath) {
     const activeTask = extractScalar(stateText, 'active_task');
     if (!activeTask) die(`${args.state} has no active_task and no --task was given`);
+    if (activeTask === 'none') {
+      console.log(`OK: ${args.state} is resting (active_task: none); nothing to validate`);
+      process.exit(0);
+    }
     taskPath = `orchestration/tasks/${activeTask}.yml`;
   }
 

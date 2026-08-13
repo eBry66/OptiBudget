@@ -34,4 +34,14 @@ describe('scripts/validate-task.mjs', () => {
     const result = run('valid-task.yml', ['--base', 'HEAD']);
     expect(result.status).toBe(0);
   });
+
+  it('exits cleanly when active_task is none and no --task is given', () => {
+    const result = spawnSync(
+      'node',
+      [SCRIPT, '--state', `${FIXTURES}resting-state.yaml`],
+      { encoding: 'utf8' }
+    );
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('resting');
+  });
 });
