@@ -246,3 +246,35 @@ needs its own stated reason, not a standing exemption.
 the first time against real application code — at that point
 `check-coverage.mjs` reporting all-AC-ids-uncovered stops being
 expected and starts being a real gate.
+
+---
+
+## 2026-08-13 — project.state.yaml's resting state, and its scope, defined for when no task is active
+
+**Decided:** when no task is active, `project.state.yaml` reads
+`active_task: none`, `authorized_branch: main`, `attempt: 0`, and
+`allowed_paths: []`. An empty `allowed_paths` is valid only when
+`active_task` is `none`; a non-empty list remains required whenever a
+task is active, per the existing shape in `HITL_GUIDE.md` §4.12.
+`required_checks` is unchanged in either state — `validate-state`,
+`validate-task`, and `unit` are CI job names, not task-scoped, and always
+run.
+
+**Why:** `project.state.yaml` was designed assuming a task is always
+active; nothing in `HITL_GUIDE.md` §4.12 or `scripts/validate-state.mjs`
+described what the file should contain between one task closing and the
+next starting. This surfaced directly after task-001 merged — its
+`active_task: task-001` field remained technically present but stale,
+with no defined alternative to set it to.
+
+**Rules out:** leaving a closed task's id sitting in `active_task`
+indefinitely as an implicit "resting state." `validate-state.mjs` and
+`validate-task.mjs` need code changes to actually accept and correctly
+handle this state — permitting an empty `allowed_paths` only under
+`active_task: none`, and having `validate-task.mjs` exit cleanly with no
+error when there is no task file to check against. Implementing those
+changes is task-002.
+
+**Revisit when:** task-002 implements the corresponding code changes —
+this entry records the decision; task-002's own acceptance record in this
+file, once merged, is the confirmation it was built correctly.
