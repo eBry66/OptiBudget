@@ -7,7 +7,8 @@
       "Edit(./project.state.yaml)",
       "Edit(./template.lock)",
       "Edit(./template.manifest.yaml)",
-      "Edit(./scripts/**)"
+      "Edit(./scripts/next.mjs)",
+      "Edit(./scripts/template-sync.mjs)"
     ]
   }
 }
