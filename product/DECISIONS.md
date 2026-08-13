@@ -212,3 +212,37 @@ second project — this default and the §7/§15 split should be verified as
 holding for that project's own task graph before it's assumed to transfer
 automatically, since template-sync only propagates machinery, not this
 kind of judgment call.
+
+---
+
+## 2026-08-13 — task-001 accepted: gate-1 enforcement machinery (CI, validators, coverage check)
+
+**Decided:** task-001's five deliverables — `scripts/validate-state.mjs`,
+`scripts/validate-task.mjs`, `scripts/check-coverage.mjs`,
+`.github/workflows/ci.yml`, and their fixture tests — are accepted per
+`HITL_GUIDE.md` §15. Merged into `main` via
+https://github.com/eBry66/OptiBudget/pull/1.
+
+**Why:** implemented per `orchestration/tasks/task-001.yml`'s spec,
+cross-vendor reviewed by Codex across three rounds with every finding
+resolved — two real bugs in `check-coverage.mjs`'s naming-contract
+matching fixed with fixtures proving the fix, one spec-wording
+discrepancy resolved by correcting `task-001.yml` to match what was
+built rather than widening scope, two findings on `AGENTS.md`/
+`HITL_GUIDE.md` rejected with textual evidence. Zero findings on any
+security-sensitive area across every review pass. `validate-task` and
+`unit` show red on this PR by design, not defect: the first correctly
+flags `task-001.yml` and its own handoff file as outside
+`allowed_paths`, the second correctly reports all `ACCEPTANCE.md` AC
+ids as uncovered because no application test suite exists yet.
+
+**Rules out:** treating either red CI check on this specific PR as
+evidence the validators are broken — they are the validators working.
+Future PRs where these checks are genuinely red for an unintended
+reason should not be waved through by citing this entry; each red check
+needs its own stated reason, not a standing exemption.
+
+**Revisit when:** task-002 begins and needs a validated `unit` job for
+the first time against real application code — at that point
+`check-coverage.mjs` reporting all-AC-ids-uncovered stops being
+expected and starts being a real gate.
