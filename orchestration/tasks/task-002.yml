@@ -1,0 +1,99 @@
+id: task-002 # must equal project.state.yaml's active_task
+branch: task-002-resting-state-validators # must equal project.state.yaml's authorized_branch
+attempt: 1 # must equal project.state.yaml's attempt
+description: >
+  Implements the project.state.yaml resting/active invariant locked in
+  product/DECISIONS.md's 2026-08-13 entry ("project.state.yaml's resting
+  state, and its scope, defined for when no task is active"):
+  validate-state.mjs accepts and enforces two shapes — resting
+  (active_task==none ∧ attempt==0 ∧ authorized_branch==main) and active
+  (active_task!=none ∧ attempt>=1 ∧ authorized_branch!=main) — layered on
+  top of the existing, unconditional allowed_paths-non-empty check, which
+  applies in both shapes and is unchanged. validate-task.mjs exits cleanly,
+  with no error, when active_task is none and no --task is given to check
+  against, instead of trying to load a nonexistent
+  orchestration/tasks/none.yml.
+
+allowed_paths:
+  - scripts/
+  - tests/
+
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+
+notes:
+  - >
+    orchestration/tasks/task-002.yml itself sits outside allowed_paths by
+    design, same as task-001.yml before it: it is the task definition, not
+    a deliverable this task produces.
+  - >
+    This task does not touch scripts/next.mjs or the real
+    project.state.yaml. next.mjs's open-task/close-task commands — the
+    writer that will actually transition project.state.yaml between these
+    two shapes — are separate, later work (task-003) that depends on this
+    task's validate-state.mjs invariant existing to call, per
+    AGENTS.md's rule that project.state.yaml stays HITL-owned.
+  - >
+    The existing "allowed_paths must be a non-empty list" check in
+    validate-state.mjs is NOT scoped to the active shape only. It stays
+    exactly as it is today and applies unconditionally in both the resting
+    and active shapes. Only the two new attempt/authorized_branch checks
+    below are conditioned on which shape applies.
+
+deliverables:
+  - path: scripts/validate-state.mjs
+    description: >
+      Adds two new invariant checks, layered on top of the existing,
+      unchanged, unconditional allowed_paths-non-empty check: when
+      active_task equals the literal string "none", attempt must equal 0
+      and authorized_branch must equal "main" (the resting shape); when
+      active_task is anything else, attempt must be >= 1 and
+      authorized_branch must not equal "main" (the active shape). Exits
+      non-zero listing every violation, same style as the existing checks.
+
+  - path: scripts/validate-task.mjs
+    description: >
+      When project.state.yaml's active_task is the literal string "none"
+      and no --task argument was given, exits 0 with an explanatory
+      message ("resting: active_task is none, nothing to validate")
+      instead of attempting to read orchestration/tasks/none.yml and
+      dying. Behavior when --task is explicitly given, or when active_task
+      names a real task, is unchanged.
+
+  - path: tests/
+    description: >
+      One fixture file per invariant branch, so a passing test proves that
+      specific check and nothing else:
+        - tests/fixtures/validate-state/resting-valid.state.yaml — resting
+          shape, allowed_paths non-empty — PASS.
+        - tests/fixtures/validate-state/resting-empty-allowed-paths.state.yaml
+          — resting shape, allowed_paths: [] — FAIL (proves the
+          unconditional check still fires at rest).
+        - tests/fixtures/validate-state/resting-bad-attempt.state.yaml —
+          resting shape, attempt != 0 — FAIL.
+        - tests/fixtures/validate-state/resting-bad-branch.state.yaml —
+          resting shape, authorized_branch != main — FAIL.
+        - tests/fixtures/validate-state/active-bad-attempt.state.yaml —
+          active shape, attempt == 0 — FAIL.
+        - tests/fixtures/validate-state/active-branch-is-main.state.yaml —
+          active shape, authorized_branch == main — FAIL.
+        - tests/fixtures/validate-task/resting-state.yaml — active_task:
+          none, no --task given — validate-task.mjs exits 0.
+      Plus the existing "passes on the real project.state.yaml" test,
+      which continues to exercise the active shape as regression coverage.
+
+review:
+  procedure: >
+    HITL_GUIDE.md §7 steps 1-5: the implementing vendor drafts this task
+    YAML and its deliverables; a different vendor reviews both against the
+    prerequisite documents named above (product/DECISIONS.md's 2026-08-13
+    resting-state entry) and reports violations only.
+  acceptance: >
+    HITL_GUIDE.md §15, not §5. As with task-001, there is no Vercel preview
+    URL (no application exists yet) and no AC id in product/ACCEPTANCE.md
+    maps to this infrastructure work, so §15.4 step 3 has nothing to check
+    for this task. Every other §15 step applies in full. This task YAML and
+    its deliverables are never entered in orchestration/approvals.yaml and
+    are never approved with `next.mjs approve`.
