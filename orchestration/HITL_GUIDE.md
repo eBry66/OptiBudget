@@ -665,11 +665,14 @@ The vendor that drafted a document must not review it [M]. That rule is the whol
 For DOC-016, THREAT_MODEL.md: the highest-risk item in this stack is Supabase Row Level Security [M]. If the drafted threat model does not discuss RLS policies per table, it is incomplete regardless of how long it is.
 
 From gate 1 onward, task YAMLs in `orchestration/tasks/` and the deliverables
-they name are agent-drafted and follow the same cross-vendor procedure by
-default. The HITL may explicitly retain authorship of a specific file. Unless
-the HITL does so, the implementing vendor drafts the task YAML when instructed,
-implements its deliverables, and a different vendor reviews both the task YAML
-and the implementation before the HITL decides whether to accept them.
+they name are agent-drafted and follow steps 1-5 of the cross-vendor procedure
+above by default: draft, review, and apply fixes. The HITL may explicitly retain
+authorship of a specific file. Unless the HITL does so, the implementing vendor
+drafts the task YAML when instructed, implements its deliverables, and a
+different vendor reviews both the task YAML and the implementation. Section 15,
+not section 5, defines HITL acceptance for task work. Task YAMLs and their
+deliverables are never entered in `orchestration/approvals.yaml` and are never
+approved with `next.mjs approve`.
 
 ## 8. GitHub, Vercel, Supabase
 
