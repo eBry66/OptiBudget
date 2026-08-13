@@ -913,6 +913,65 @@ Do not use the web editor for `approvals.yaml`, `bootstrap.yaml`, `project.state
 
 From gate 1 onward your loop is: read the checklist, use the app, confirm the check is green, write one accept or reject line. All four are doable from an iPad. The build loop needs a PC; the decision loop does not.
 
+## 15. Task Review, Gate 1 Onward
+
+Gate 0 approves documents. From task-001 the unit of review is a pull request, and the six questions that matter are different ones.
+
+### 15.1 When it first applies
+
+Not until task-001. The template does nothing until a pull request exists, and no pull request exists until an agent pushes a branch. Before then the file sits unused in the repository, which is correct.
+
+### 15.2 Where the form lives, and one correction
+
+`.github/PULL_REQUEST_TEMPLATE.md`, committed once at the repository root path shown. GitHub then pre-fills the description of every new pull request with it, automatically, with no configuration.
+
+Correction to an earlier claim in this guide: the pull request description is not bound to a commit. It can be edited at any time, and nothing records when or against what. The commit-bound artifact is GitHub's Review action — the Approve or Request changes button — which is what the stale-review setting in 15.5 dismisses.
+
+So the two are used together. The description is the worksheet you fill in while reviewing. The Review action is the signed record. Complete the checklist in the description, then submit a Review carrying your decision line. Without the second step, your accept exists only as editable text.
+
+### 15.3 Who fills in what
+
+The implementing agent opens the pull request and fills the five header lines: task id, attempt, preview URL, REQ ids, AC ids. Nothing else. `AGENTS.md` forbids it from ticking a checkbox, writing in Accepted deviations, or writing a decision — an agent that fills in your review has not saved you time, it has removed the review.
+
+Everything below the header is yours.
+
+Not a `reviews/` folder. Three reasons: a second ledger can drift from `approvals.yaml`; a file written after the fact is not bound to the commit it judged, whereas a pull request review is; and a folder in the repository cannot be filled in from an iPad, which defeats the property that makes this workable at all.
+
+### 15.4 The review sequence
+
+1. GitHub, on any device — read the diff, the requirements it claims to satisfy, and the reviewing vendor's findings.
+2. CI — read green or red. This is the only evidence that a check passed.
+3. Vercel preview URL — open the app and confirm each acceptance criterion with your hands.
+4. Pull request description — complete the template. On a phone or tablet, tap the checkboxes directly in the rendered description; GitHub saves each tick immediately and you never edit Markdown by hand.
+5. Files changed tab, Review changes — write the decision line and submit as Approve or Request changes. This is the record that survives.
+6. `product/DECISIONS.md` — one line with the date, task id, decision, and the pull request URL.
+
+Steps 1 to 5 need a browser and nothing else. Only the merge and any subsequent approval command need the PC.
+
+### 15.5 Required branch protection setting
+
+Enable "Dismiss stale pull request approvals when new commits are pushed."
+
+Without it you can approve on Monday, an agent pushes on Tuesday, and your approval still shows as valid against code you have never seen. That single setting is what binds your judgment to a specific commit.
+
+### 15.6 The resulting audit trail
+
+- Engineering evidence: the diff and the CI run, in GitHub.
+- Human reasoning: the completed checklist in the description, and the submitted Review, which GitHub attaches to the exact commit and dismisses if that commit changes.
+- Authoritative record: `product/DECISIONS.md` and, for documents, `approvals.yaml`.
+
+Each layer points at the next. None duplicates another, which is what keeps them from disagreeing.
+
+### 15.7 The question your checklist cannot answer
+
+"Are the automated test results sufficient?" cannot be answered by looking at CI. Green means the tests that exist passed; it says nothing about the tests that were never written. The real answer comes from `check-coverage.mjs`, which fails when an AC id in `ACCEPTANCE.md` has no matching test [M]. Keep the checkbox, but read it as a coverage question, not a CI question.
+
+### 15.8 The trap
+
+Every box on the form except one is a paper check that a careful liar could tick without leaving their chair. The exception is confirming each acceptance criterion by hand in the preview.
+
+That is the only step where your judgment is irreplaceable, and it is the first one that gets skipped when you are tired. The template therefore asks you to list which AC ids you actually exercised — a shorter list than the one you claimed is not a failure, but leaving it blank is.
+
 ## 16. The Two Phases: Product and Engineering
 
 ### 16.1 The split
@@ -1103,63 +1162,3 @@ Do not use `git reset --hard`, `git rebase`, or `git push --force`. They discard
 - semver — version numbering as major.minor.patch. Patch means a fix, minor means an addition, major means something you must read carefully.
 - dry run — a mode that reports what would change and writes nothing. Run it first, every time.
 - idempotent — running the same command twice changes nothing the second time. `template-sync.mjs` is.
-
-
-## 15. Task Review, Gate 1 Onward
-
-Gate 0 approves documents. From task-001 the unit of review is a pull request, and the six questions that matter are different ones.
-
-### 15.1 When it first applies
-
-Not until task-001. The template does nothing until a pull request exists, and no pull request exists until an agent pushes a branch. Before then the file sits unused in the repository, which is correct.
-
-### 15.2 Where the form lives, and one correction
-
-`.github/PULL_REQUEST_TEMPLATE.md`, committed once at the repository root path shown. GitHub then pre-fills the description of every new pull request with it, automatically, with no configuration.
-
-Correction to an earlier claim in this guide: the pull request description is not bound to a commit. It can be edited at any time, and nothing records when or against what. The commit-bound artifact is GitHub's Review action — the Approve or Request changes button — which is what the stale-review setting in 15.5 dismisses.
-
-So the two are used together. The description is the worksheet you fill in while reviewing. The Review action is the signed record. Complete the checklist in the description, then submit a Review carrying your decision line. Without the second step, your accept exists only as editable text.
-
-### 15.3 Who fills in what
-
-The implementing agent opens the pull request and fills the five header lines: task id, attempt, preview URL, REQ ids, AC ids. Nothing else. `AGENTS.md` forbids it from ticking a checkbox, writing in Accepted deviations, or writing a decision — an agent that fills in your review has not saved you time, it has removed the review.
-
-Everything below the header is yours.
-
-Not a `reviews/` folder. Three reasons: a second ledger can drift from `approvals.yaml`; a file written after the fact is not bound to the commit it judged, whereas a pull request review is; and a folder in the repository cannot be filled in from an iPad, which defeats the property that makes this workable at all.
-
-### 15.4 The review sequence
-
-1. GitHub, on any device — read the diff, the requirements it claims to satisfy, and the reviewing vendor's findings.
-2. CI — read green or red. This is the only evidence that a check passed.
-3. Vercel preview URL — open the app and confirm each acceptance criterion with your hands.
-4. Pull request description — complete the template. On a phone or tablet, tap the checkboxes directly in the rendered description; GitHub saves each tick immediately and you never edit Markdown by hand.
-5. Files changed tab, Review changes — write the decision line and submit as Approve or Request changes. This is the record that survives.
-6. `product/DECISIONS.md` — one line with the date, task id, decision, and the pull request URL.
-
-Steps 1 to 5 need a browser and nothing else. Only the merge and any subsequent approval command need the PC.
-
-### 15.5 Required branch protection setting
-
-Enable "Dismiss stale pull request approvals when new commits are pushed."
-
-Without it you can approve on Monday, an agent pushes on Tuesday, and your approval still shows as valid against code you have never seen. That single setting is what binds your judgment to a specific commit.
-
-### 15.6 The resulting audit trail
-
-- Engineering evidence: the diff and the CI run, in GitHub.
-- Human reasoning: the completed checklist in the description, and the submitted Review, which GitHub attaches to the exact commit and dismisses if that commit changes.
-- Authoritative record: `product/DECISIONS.md` and, for documents, `approvals.yaml`.
-
-Each layer points at the next. None duplicates another, which is what keeps them from disagreeing.
-
-### 15.7 The question your checklist cannot answer
-
-"Are the automated test results sufficient?" cannot be answered by looking at CI. Green means the tests that exist passed; it says nothing about the tests that were never written. The real answer comes from `check-coverage.mjs`, which fails when an AC id in `ACCEPTANCE.md` has no matching test [M]. Keep the checkbox, but read it as a coverage question, not a CI question.
-
-### 15.8 The trap
-
-Every box on the form except one is a paper check that a careful liar could tick without leaving their chair. The exception is confirming each acceptance criterion by hand in the preview.
-
-That is the only step where your judgment is irreplaceable, and it is the first one that gets skipped when you are tired. The template therefore asks you to list which AC ids you actually exercised — a shorter list than the one you claimed is not a failure, but leaving it blank is.
