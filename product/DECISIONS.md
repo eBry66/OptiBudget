@@ -278,3 +278,19 @@ changes is task-002.
 **Revisit when:** task-002 implements the corresponding code changes —
 this entry records the decision; task-002's own acceptance record in this
 file, once merged, is the confirmation it was built correctly.
+
+---
+
+## 2026-08-14 — task-002 (resting-state validators) merged, PR #6. Accepted:
+
+unit check red due to pre-existing check-coverage.mjs defect (logged
+2026-08-13), not caused by this task. validate-state and validate-task
+both green, Codex-reviewed.
+
+---
+
+## 2026-08-14 — task-002 (resting-state validators) merged, PR #6. Accepted:
+
+unit check red due to pre-existing check-coverage.mjs defect (logged
+2026-08-13), not caused by this task. validate-state and validate-task
+both green, Codex-reviewed.
