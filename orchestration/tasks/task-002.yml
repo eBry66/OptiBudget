@@ -60,7 +60,15 @@ deliverables:
       message ("resting: active_task is none, nothing to validate")
       instead of attempting to read orchestration/tasks/none.yml and
       dying. Behavior when --task is explicitly given, or when active_task
-      names a real task, is unchanged.
+      names a real task, is unchanged. The diff-outside-allowed_paths check
+      exempts exactly two paths in addition to the task's own
+      allowed_paths — orchestration/tasks/<id>.yml (the task's own id, not
+      whatever --task happened to be given) and the literal string
+      project.state.yaml — since both are structurally guaranteed to
+      appear in the diff whenever a branch opens or closes the task, and
+      neither belongs in a task's own allowed_paths. This exception is not
+      part of any task YAML's own allowed_paths list; it lives only in
+      validate-task.mjs's diff-filtering step.
 
   - path: tests/
     description: >
