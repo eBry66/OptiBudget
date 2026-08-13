@@ -29,4 +29,10 @@ describe('scripts/check-coverage.mjs', () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('no test title is prefixed [AC-001]');
   });
+
+  it("fails when the test file's area folder is not one of TESTING.md's named areas", () => {
+    const result = run('wrong-area');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('AC-001 has no matching test file');
+  });
 });

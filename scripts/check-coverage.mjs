@@ -6,7 +6,17 @@
 // Usage: node scripts/check-coverage.mjs [--acceptance <path>] [--tests <dir>]
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
+
+// The requirement-group folders engineering/TESTING.md names as <area>.
+const TESTING_AREAS = ['accounts', 'import', 'transactions', 'transfers', 'categories', 'reports'];
+
+// Matches the full tests/<area>/AC-0NN.<slug>.test.ts path (relative to the
+// tests root), not just the basename - so a file in the wrong folder, or
+// with an uppercase/underscored slug, is correctly not counted as coverage.
+const COVERAGE_PATH_RE = new RegExp(
+  `^(${TESTING_AREAS.join('|')})/AC-(\\d{3})\\.[a-z0-9]+(?:-[a-z0-9]+)*\\.test\\.ts$`
+);
 
 function die(msg) {
   console.error(`ERROR: ${msg}`);
@@ -28,6 +38,10 @@ function acIdsIn(text) {
   let m;
   while ((m = re.exec(text))) ids.add(m[1]);
   return ids;
+}
+
+function toPosix(p) {
+  return p.split(/[\\/]/).join('/');
 }
 
 function walk(dir) {
@@ -53,16 +67,16 @@ function main() {
   const acceptanceText = readFileSync(args.acceptance, 'utf8');
   const acIds = acIdsIn(acceptanceText);
 
-  const FILENAME_RE = /^AC-(\d{3})\..+\.test\.ts$/;
   const testFiles = walk(args.tests).filter((f) => /\.test\.ts$/.test(f));
 
   const covered = new Map();
   for (const file of testFiles) {
-    const base = file.split(/[\\/]/).pop();
-    const m = base.match(FILENAME_RE);
+    const rel = toPosix(relative(args.tests, file));
+    const m = rel.match(COVERAGE_PATH_RE);
     if (!m) continue;
-    if (!covered.has(m[1])) covered.set(m[1], []);
-    covered.get(m[1]).push(file);
+    const id = m[2];
+    if (!covered.has(id)) covered.set(id, []);
+    covered.get(id).push(file);
   }
 
   const violations = [];
