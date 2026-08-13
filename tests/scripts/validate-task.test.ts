@@ -14,6 +14,15 @@ function run(taskFile: string, extraArgs: string[] = []) {
 }
 
 describe('scripts/validate-task.mjs', () => {
+  it("fails when a task YAML's id/branch/attempt do not equal project.state.yaml's", () => {
+    const result = run('identity-mismatch-task.yml');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("does not equal");
+    expect(result.stderr).toContain('active_task');
+    expect(result.stderr).toContain('authorized_branch');
+    expect(result.stderr).toContain('as an integer');
+  });
+
   it("fails when a task YAML's allowed_paths escapes project.state.yaml's", () => {
     const result = run('escaping-task.yml');
     expect(result.status).not.toBe(0);

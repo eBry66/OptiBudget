@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // scripts/validate-task.mjs - validates a task YAML against project.state.yaml:
-// (1) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
-// (2) every file the task's diff touches falls within the task's own
+// (1) the task's id, branch, and attempt equal project.state.yaml's
+//     active_task, authorized_branch, and attempt;
+// (2) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
+// (3) every file the task's diff touches falls within the task's own
 //     allowed_paths.
 // Zero dependencies.
 // Usage: node scripts/validate-task.mjs [--task <path>] [--state <path>] [--base <ref>]
@@ -52,6 +54,10 @@ function isWithinAllowedPaths(file, allowedPaths) {
   return allowedPaths.some((p) => file === p || file.startsWith(p.endsWith('/') ? p : `${p}/`));
 }
 
+function toInt(raw) {
+  return /^-?\d+$/.test(raw ?? '') ? Number(raw) : NaN;
+}
+
 function resolveBaseRef(args) {
   if (args.base) return args.base;
   if (process.env.GITHUB_BASE_REF) return `origin/${process.env.GITHUB_BASE_REF}`;
@@ -82,6 +88,38 @@ function main() {
   }
 
   const taskText = readYamlFile(taskPath, 'task file');
+
+  const taskId = extractScalar(taskText, 'id');
+  const taskBranch = extractScalar(taskText, 'branch');
+  const taskAttempt = extractScalar(taskText, 'attempt');
+  const stateActiveTask = extractScalar(stateText, 'active_task');
+  const stateAuthorizedBranch = extractScalar(stateText, 'authorized_branch');
+  const stateAttempt = extractScalar(stateText, 'attempt');
+
+  const identityViolations = [];
+  if (taskId !== stateActiveTask) {
+    identityViolations.push(
+      `id (${JSON.stringify(taskId)}) does not equal ${args.state}'s active_task (${JSON.stringify(stateActiveTask)})`
+    );
+  }
+  if (taskBranch !== stateAuthorizedBranch) {
+    identityViolations.push(
+      `branch (${JSON.stringify(taskBranch)}) does not equal ${args.state}'s authorized_branch (${JSON.stringify(stateAuthorizedBranch)})`
+    );
+  }
+  const taskAttemptNum = toInt(taskAttempt);
+  const stateAttemptNum = toInt(stateAttempt);
+  if (Number.isNaN(taskAttemptNum) || Number.isNaN(stateAttemptNum) || taskAttemptNum !== stateAttemptNum) {
+    identityViolations.push(
+      `attempt (${JSON.stringify(taskAttempt)}) does not equal ${args.state}'s attempt (${JSON.stringify(stateAttempt)}) as an integer`
+    );
+  }
+  if (identityViolations.length) {
+    console.error(`INVALID: ${taskPath}`);
+    for (const v of identityViolations) console.error(`  - ${v}`);
+    process.exit(1);
+  }
+
   const taskAllowedPaths = extractList(taskText, 'allowed_paths');
   if (taskAllowedPaths === undefined || taskAllowedPaths.length === 0) {
     die(`${taskPath} has no allowed_paths list`);
