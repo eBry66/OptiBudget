@@ -1024,6 +1024,45 @@ The engineering phase begins when `SCOPE.md` is approved. From that moment the p
 
 That is the whole contract. The product phase is where you are irreplaceable and where the system cannot check your work. The engineering phase is where the vendors are fast and the machinery can check theirs.
 
+## 17. Review Calibration and Solo-Repo Corrections
+
+Four corrections, all discovered during task-001, the first task run through this system end to end. Each cost real time to find. None should cost time again.
+
+### 17.1 When raw verification is required, and when it isn't
+
+Section 5's discipline — read the actual file, not a vendor's summary of it — is correct for HITL-owned documents, where you are the only check that exists. It was over-applied during task-001 to things that had already been verified another way: a vendor's stated prediction of a CI failure, cross-checked once against the actual script logic, does not also need the HITL to click into the CI log and transcribe it. That is re-confirming an already-closed question, not catching a new one.
+
+Apply raw verification without exception to:
+- Any commit or push claim — "committed" and "pushed" are different states, and a vendor's summary of one is not evidence of the other. Verify from `git log`, `git status`, or a direct repository fetch.
+- Any content a vendor describes but that has not yet been read from the file itself — the description and the file can diverge, and did, more than once during task-001.
+- Anything sensitive-area adjacent: authentication, authorisation, row-level security, money arithmetic, secrets handling. No claim about these is ever taken on trust alone.
+
+Treat as sufficient without a second raw check:
+- A vendor's stated prediction that is later corroborated by an independent source check the HITL or reviewer already performed — for example, a predicted CI failure whose cause was already confirmed by reading the validator's source code.
+- A cross-vendor review finding once that review has actually happened and its output has been read directly (the review output itself still needs reading — this is not license to skip *that*).
+
+The test: has this specific claim already been checked against a primary source by anyone, including within the same conversation? If yes, checking it again is ceremony. If no, check it.
+
+### 17.2 Governance fixes discovered mid-task stay on their own branch
+
+Task-001 surfaced a real ambiguity in this document (task-YAML authorship, closed in section 7) partway through implementation. The fix was committed to the task's own branch because that was the branch already checked out, not because it belonged there. The result: a single pull request carrying 25 commits, only 8 of which were task-001's actual deliverables, with the remaining 17 split across `AGENTS.md`, two rounds of this document, `.claude/settings.json`, and `product/DECISIONS.md` — none of them task-001 work, all of them individually correct and individually approved, but all reviewed as one bundle when they were five separate decisions.
+
+When a document defect surfaces mid-task: stop the task branch where it is, switch to a fresh branch off `main` for the governance fix alone, commit and merge it there, then return to the task branch and continue. This costs one extra `git checkout` and one extra small PR. It buys a task PR whose diff is actually the task, and a governance-fix PR whose diff is actually the fix — each judgable on its own terms, per this project's own principle of one isolated change per edit.
+
+### 17.3 Solo-repo GitHub Review substitute
+
+Section 15.4 step 5 and section 15.6 assume a GitHub Review action — Approve or Request changes — submitted by the HITL and bound to the commit. On a single-owner repository, GitHub blocks the PR author from approving their own pull request. There is no second human account to press it.
+
+Substitute: on a solo repository, the completed PR description — Accepted deviations and Decision sections filled in, per section 15's own template — is the binding record in place of a Review action. This is weaker than section 15.6 originally described (the description remains editable text, per the section 15.2 correction), but on a repository with exactly one committer and one approver, there is no second party who could quietly edit it unnoticed, which is the risk the Review-action requirement exists to guard against. Merge directly once the description is complete; do not attempt to force an Approve action GitHub will not permit.
+
+If this project ever gains a second HITL or a second approving human, section 15.4 step 5 as originally written applies again without modification, and this substitution stops applying.
+
+### 17.4 `allowed_paths` scopes a task's deliverables, not document revisions
+
+`project.state.yaml`'s `allowed_paths` is the input to `validate-task.mjs`'s subset check against one specific task YAML. It does not govern, and was never meant to govern, revisions to documents in the DOC-id graph — `AGENTS.md`, this file, or any other `bootstrap.yaml` entry. Those are governed by `bootstrap.yaml` itself (which documents exist, their `owner`, their `depends_on`) plus explicit HITL instruction under section 7's procedure, independent of whatever task happens to be active or which branch is checked out.
+
+An agent encountering an instruction to revise a DOC-graph document while a task is active, on a branch outside that task's `allowed_paths`, should not treat this as a scope violation requiring HITL escalation before proceeding — an explicit HITL instruction to revise a specific document is itself the authorization section 7 requires. Escalation is still correct when the instruction is ambiguous about which document, or absent entirely; it is not correct as a blanket response to any write outside the current task's `allowed_paths`.
+
 ## Appendix A. Vocabulary and Core Mechanics
 
 Read this before section 2 if you have never used Git. Every term below appears in this guide or in an error message you will meet. Definitions are deliberately short; the goal is recognition, not expertise.
