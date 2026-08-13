@@ -1,12 +1,10 @@
 version: 1
 gate: 1
-active_task: task-002
+active_task: task-999
 attempt: 1
-authorized_branch: task-002-resting-state-validators
+authorized_branch: main
 allowed_paths:
-  - .github/workflows/
   - scripts/
-  - tests/
 required_checks:
   - validate-state
   - validate-task

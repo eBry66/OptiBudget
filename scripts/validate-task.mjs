@@ -84,6 +84,10 @@ function main() {
   if (!taskPath) {
     const activeTask = extractScalar(stateText, 'active_task');
     if (!activeTask) die(`${args.state} has no active_task and no --task was given`);
+    if (activeTask === 'none') {
+      console.log(`OK: ${args.state} is resting (active_task: none); nothing to validate`);
+      process.exit(0);
+    }
     taskPath = `orchestration/tasks/${activeTask}.yml`;
   }
 
@@ -135,7 +139,13 @@ function main() {
   const base = resolveBaseRef(args);
   const changedFiles = diffFiles(base);
 
-  const outside = changedFiles.filter((f) => !isWithinAllowedPaths(f, taskAllowedPaths));
+  // A task's own YAML and project.state.yaml are structurally guaranteed to
+  // appear in the diff whenever a branch opens or closes that task, and
+  // neither belongs in a task's own allowed_paths (they're state-machine
+  // bookkeeping, not something the task writes to). Exempt exactly these
+  // two paths from the outside-allowed_paths check, and nothing else.
+  const exemptPaths = new Set([`orchestration/tasks/${taskId}.yml`, 'project.state.yaml']);
+  const outside = changedFiles.filter((f) => !isWithinAllowedPaths(f, taskAllowedPaths) && !exemptPaths.has(f));
   if (outside.length) {
     console.error(`INVALID: diff against ${base} touches files outside ${taskPath}'s allowed_paths:`);
     for (const f of outside) console.error(`  - ${f}`);
