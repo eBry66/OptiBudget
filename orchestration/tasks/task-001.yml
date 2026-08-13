@@ -24,6 +24,13 @@ notes:
     produces, so their absence from allowed_paths is not a gap to fix
     later.
   - >
+    The id/branch/attempt equality constraint stated in this file's header
+    comments (id, branch, attempt above) is enforced in code:
+    scripts/validate-task.mjs compares this file's id, branch, and attempt
+    against project.state.yaml's active_task, authorized_branch, and
+    attempt, and exits non-zero with the specific mismatch on any
+    violation. It is no longer a comment only a human reader would check.
+  - >
     Field-level validation semantics beyond the id/branch/attempt equality
     checks above — path normalization, unknown-key handling, diff-range
     semantics, and similar — are scripts/validate-state.mjs's and
