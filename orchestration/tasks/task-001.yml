@@ -63,9 +63,14 @@ deliverables:
   - path: .github/workflows/ci.yml
     description: >
       Runs validate-state and validate-task directly, and a unit check
-      whose npm script chains `vitest run && node
-      scripts/check-coverage.mjs`. Three checks, matching required_checks
-      above exactly — no fourth entry is added to project.state.yaml.
+      whose workflow step chains `npm test && node
+      scripts/check-coverage.mjs` directly — functionally equivalent to a
+      chained npm script (`npm test` already runs `vitest run`, per the
+      existing package.json), without adding a script to package.json or
+      reopening project.state.yaml's approved allowed_paths, neither of
+      which this task's allowed_paths cover. Three checks, matching
+      required_checks above exactly — no fourth entry is added to
+      project.state.yaml.
 
   - path: tests/
     description: >
