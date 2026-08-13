@@ -1,0 +1,12 @@
+version: 1
+gate: 1
+active_task: none
+attempt: 0
+authorized_branch: task-001-ci-and-validators
+allowed_paths:
+  - scripts/
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+frozen: false

@@ -66,6 +66,28 @@ function main() {
     violations.push('allowed_paths must be a non-empty list');
   }
 
+  // Resting/active invariant (product/DECISIONS.md, 2026-08-13): resting
+  // requires attempt==0 and authorized_branch==main; active requires
+  // attempt>=1 and authorized_branch!=main. This is layered on top of the
+  // allowed_paths check above, which is unconditional in both shapes.
+  const activeTask = extractScalar(text, 'active_task');
+  const authorizedBranch = extractScalar(text, 'authorized_branch');
+  if (activeTask === 'none') {
+    if (attempt !== undefined && attempt !== '0') {
+      violations.push(`attempt must be 0 when active_task is none (resting), got: ${JSON.stringify(attempt)}`);
+    }
+    if (authorizedBranch !== undefined && authorizedBranch !== 'main') {
+      violations.push(`authorized_branch must be main when active_task is none (resting), got: ${JSON.stringify(authorizedBranch)}`);
+    }
+  } else if (activeTask !== undefined) {
+    if (attempt !== undefined && /^-?\d+$/.test(attempt) && Number(attempt) < 1) {
+      violations.push(`attempt must be >= 1 when a task is active (active_task: ${activeTask}), got: ${JSON.stringify(attempt)}`);
+    }
+    if (authorizedBranch !== undefined && authorizedBranch === 'main') {
+      violations.push(`authorized_branch must not be main when a task is active (active_task: ${activeTask})`);
+    }
+  }
+
   const requiredChecks = extractList(text, 'required_checks');
   if (requiredChecks !== undefined && requiredChecks.length === 0) {
     violations.push('required_checks must be a non-empty list');

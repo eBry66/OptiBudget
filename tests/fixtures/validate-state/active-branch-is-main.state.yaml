@@ -1,0 +1,12 @@
+version: 1
+gate: 1
+active_task: task-999
+attempt: 1
+authorized_branch: main
+allowed_paths:
+  - scripts/
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+frozen: false
