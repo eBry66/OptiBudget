@@ -1,0 +1,44 @@
+import { describe, it, expect } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const SCRIPT = fileURLToPath(new URL('../../scripts/check-coverage.mjs', import.meta.url));
+const FIXTURES = fileURLToPath(new URL('../fixtures/check-coverage/', import.meta.url));
+
+function run(caseDir: string) {
+  return spawnSync(
+    'node',
+    [
+      SCRIPT,
+      '--acceptance', `${FIXTURES}${caseDir}/ACCEPTANCE.md`,
+      '--tests', `${FIXTURES}${caseDir}/tests`,
+    ],
+    { encoding: 'utf8' }
+  );
+}
+
+describe('scripts/check-coverage.mjs', () => {
+  it('fails when an AC id has no matching test file', () => {
+    const result = run('missing-ac');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('AC-002 has no matching test file');
+  });
+
+  it('fails when a matched test file has no title prefixed [AC-0NN]', () => {
+    const result = run('bad-title');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('no test title is prefixed [AC-001]');
+  });
+
+  it("fails when the test file's area folder is not one of TESTING.md's named areas", () => {
+    const result = run('wrong-area');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('AC-001 has no matching test file');
+  });
+
+  it('fails when [AC-0NN] appears only in a comment, not as a real test title', () => {
+    const result = run('stray-mention');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('no test title is prefixed [AC-001]');
+  });
+});

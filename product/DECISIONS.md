@@ -162,3 +162,53 @@ with-mortgage user, per `product/PRODUCT.md`. At that point this needs: a
 REQ id for renaming a household, a REQ id for removing a member (including
 what happens to that member's data and any remaining member's access), and
 the corresponding `UPDATE` / `DELETE` policies added to `engineering/THREAT_MODEL.md`.
+
+---
+
+## 2026-08-13 — Task YAMLs and their deliverables are agent-drafted by default; HITL authorship requires explicit retention
+
+**Decided:** `orchestration/tasks/*.yml` and the deliverables they name are,
+by default, drafted by the implementing vendor and cross-vendor reviewed,
+per `HITL_GUIDE.md` §7 steps 1–5, with `HITL_GUIDE.md` §15 — not §5 or
+`approvals.yaml` — governing HITL acceptance of the result. The HITL may
+explicitly retain authorship of a specific file; absent that, an agent does
+not wait to be told the HITL will write it.
+
+**Why:** `bootstrap.yaml`'s `owner: hitl` / `owner: agent` field exists only
+for the 26 DOC ids in the gate-0 document graph. Task YAMLs sit entirely
+outside that graph, so no file anywhere stated who authors them.
+`HITL_GUIDE.md` §10 listed "write `orchestration/tasks/task-001.yml`" as an
+unqualified imperative inside a numbered list of HITL actions, and §7 was
+written entirely in terms of DOC ids, never stating it also governs task
+work. Both the HITL and Claude Code independently read that silence as
+"the HITL writes it" — backwards for a vibe-coding methodology where the
+default should be agent-drafts / agent-reviews / HITL-accepts, with HITL
+authorship being the stated exception. This stalled `task-001` until
+caught and corrected: `AGENTS.md` (DOC-004, commit `553bcac`) gained a
+"Task specifics" section stating the default; `HITL_GUIDE.md` (DOC-026,
+commits `8faee91` and `bb9e1df`) extended §7 to cover task YAMLs
+explicitly (scoped to steps 1–5, not step 6's `next.mjs approve`, which
+remains exclusive to `bootstrap.yaml` DOC ids) and reworded §10's
+instruction from HITL-authorship to vendor-delegation. Both revisions
+were cross-vendor reviewed by Codex before approval; two of Codex's three
+initial findings on the `AGENTS.md` change were rejected with textual
+evidence (they misapplied gate-1's `allowed_paths` and misread the
+gate-0-exit cascade in §10 as a permanent freeze), one was accepted and
+fixed (the `HITL_GUIDE.md` citation `AGENTS.md` relied on didn't yet say
+what it was cited for).
+
+**Rules out:** any future artifact outside the DOC-id graph being treated
+as HITL-authored by default because no file states otherwise. Silence on
+ownership is no longer read as "the HITL writes it" — the default is
+agent-drafted unless a document says otherwise for that specific file.
+Also rules out task YAMLs or their deliverables ever being entered in
+`orchestration/approvals.yaml` or approved with `next.mjs approve` — §15's
+PR-review and `DECISIONS.md` mechanism is the sole acceptance path for
+gate-1 work, kept deliberately separate from the DOC-id approval ledger so
+the two records cannot drift out of sync with each other.
+
+**Revisit when:** the template (`§13`) is next extracted or updated for a
+second project — this default and the §7/§15 split should be verified as
+holding for that project's own task graph before it's assumed to transfer
+automatically, since template-sync only propagates machinery, not this
+kind of judgment call.

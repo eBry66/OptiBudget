@@ -1,0 +1,7 @@
+id: task-999
+branch: some-other-branch
+attempt: 2
+allowed_paths:
+  - scripts/
+required_checks:
+  - unit

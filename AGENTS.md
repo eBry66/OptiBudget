@@ -52,6 +52,12 @@ During gate 0 you draft only the single document named by the HITL, and only
 documents whose owner is `agent` in bootstrap.yaml. You do not create folders,
 scaffolding, dependencies, or code.
 
+## Task specifics
+Task YAMLs in `orchestration/tasks/` and the deliverables they name are
+agent-drafted and cross-vendor-reviewed by default, per HITL_GUIDE.md §7,
+unless the HITL explicitly retains a specific file. An agent must not wait
+for the HITL to write a task YAML — it drafts one when instructed to.
+
 ## Handoff
 At the end of any session, write assumptions, open questions, and blockers to
 `orchestration/handoffs/<doc-or-task-id>-<n>.md`. Narrative belongs there and

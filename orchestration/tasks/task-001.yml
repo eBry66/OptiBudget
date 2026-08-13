@@ -1,0 +1,102 @@
+id: task-001 # must equal project.state.yaml's active_task
+branch: task-001-ci-and-validators # must equal project.state.yaml's authorized_branch
+attempt: 1 # must equal project.state.yaml's attempt
+description: >
+  Build the enforcement machinery gate 1 depends on: CI, the two
+  validators, coverage-check wiring, and fixture tests proving each
+  validator can actually fail.
+
+allowed_paths:
+  - .github/workflows/
+  - scripts/
+  - tests/
+
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+
+notes:
+  - >
+    orchestration/tasks/task-001.yml itself and orchestration/handoffs/ sit
+    outside allowed_paths by design: the former is the task definition,
+    the latter is the session record, neither is a deliverable this task
+    produces, so their absence from allowed_paths is not a gap to fix
+    later.
+  - >
+    The id/branch/attempt equality constraint stated in this file's header
+    comments (id, branch, attempt above) is enforced in code:
+    scripts/validate-task.mjs compares this file's id, branch, and attempt
+    against project.state.yaml's active_task, authorized_branch, and
+    attempt, and exits non-zero with the specific mismatch on any
+    violation. It is no longer a comment only a human reader would check.
+  - >
+    Field-level validation semantics beyond the id/branch/attempt equality
+    checks above — path normalization, unknown-key handling, diff-range
+    semantics, and similar — are scripts/validate-state.mjs's and
+    scripts/validate-task.mjs's own implementation decisions, established
+    and reviewed when those scripts are drafted, not pre-specified here.
+
+deliverables:
+  - path: scripts/validate-state.mjs
+    description: >
+      Validates project.state.yaml against the shape in HITL_GUIDE.md
+      §4.12: required keys (version, gate, active_task, attempt,
+      authorized_branch, allowed_paths, required_checks, frozen) are
+      present; gate and attempt are integers; frozen is a boolean;
+      allowed_paths and required_checks are non-empty lists. Exits
+      non-zero on any violation.
+
+  - path: scripts/validate-task.mjs
+    description: >
+      Validates that a task YAML's allowed_paths is a subset of
+      project.state.yaml's allowed_paths, and that every file the task's
+      diff touches falls within the task YAML's own allowed_paths. Exits
+      non-zero on any violation.
+
+  - path: scripts/check-coverage.mjs
+    description: >
+      Fails when an AC id in product/ACCEPTANCE.md has no matching test,
+      per the naming contract in engineering/TESTING.md: test file name
+      tests/<area>/AC-0NN.<slug>.test.ts, test title prefixed [AC-0NN].
+
+  - path: .github/workflows/ci.yml
+    description: >
+      Runs validate-state and validate-task directly, and a unit check
+      whose workflow step chains `npm test && node
+      scripts/check-coverage.mjs` directly — functionally equivalent to a
+      chained npm script (`npm test` already runs `vitest run`, per the
+      existing package.json), without adding a script to package.json or
+      reopening project.state.yaml's approved allowed_paths, neither of
+      which this task's allowed_paths cover. Three checks, matching
+      required_checks above exactly — no fourth entry is added to
+      project.state.yaml.
+
+  - path: tests/
+    description: >
+      Fixture tests proving each of the three validators above fails on a
+      deliberately broken input (malformed project.state.yaml, a task
+      YAML whose allowed_paths escapes project.state.yaml's, an AC id
+      with no matching test). A validator never seen to fail is not
+      evidence of anything (HITL_GUIDE.md §10).
+
+review:
+  procedure: >
+    HITL_GUIDE.md §7 steps 1-5: the implementing vendor drafts this task
+    YAML and its deliverables; a different vendor reviews both against
+    the prerequisite documents named above and reports violations only.
+  acceptance: >
+    HITL_GUIDE.md §15, not §5. Two of §15's steps do not apply to this
+    task and are explicitly not applicable, not silently skipped: there
+    is no Vercel preview URL, because no application exists yet to
+    deploy, and no AC id in product/ACCEPTANCE.md maps to infrastructure
+    work, so "confirm each acceptance criterion by hand in the preview"
+    (§15.4 step 3, the §15.8 step that matters most) has nothing to
+    check for this task. Every other §15 step applies in full: read the
+    diff and the reviewing vendor's findings (§15.4 step 1), read CI
+    green or red (§15.4 step 2), complete the pull request description
+    (§15.4 step 4), submit the decision line as a Review (§15.4 step 5),
+    and record one line in product/DECISIONS.md (§15.4 step 6). This
+    task YAML and its deliverables are never entered in
+    orchestration/approvals.yaml and are never approved with
+    `next.mjs approve`.
