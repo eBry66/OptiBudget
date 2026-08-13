@@ -382,3 +382,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-13
     based_on: [DOC-003@7b512e8cd13f8cdbe30d54d110841dbe7261c75d]
     note: "adds Task specifics: task YAMLs agent-drafted by default per HITL_GUIDE §7 unless HITL retains a file"
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    commit: bb9e1df8f25d4414ac9ff71169063ae84415f9af
+    approved_at: 2026-08-13
+    based_on: []
+    note: "§7/§10 extended for agent-drafted task YAMLs; §15, not §5, governs their acceptance; excluded from approvals.yaml"
