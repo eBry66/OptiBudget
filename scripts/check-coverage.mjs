@@ -44,6 +44,17 @@ function toPosix(p) {
   return p.split(/[\\/]/).join('/');
 }
 
+// Extracts it()/test() title strings - not just any occurrence of
+// [AC-0NN] anywhere in the file, which would also match a comment or a
+// stray literal that isn't actually a test's title.
+function testTitlesIn(content) {
+  const titles = [];
+  const re = /\b(?:it|test)\s*\(\s*(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g;
+  let m;
+  while ((m = re.exec(content))) titles.push(m[2]);
+  return titles;
+}
+
 function walk(dir) {
   if (!existsSync(dir)) return [];
   const out = [];
@@ -90,7 +101,8 @@ function main() {
   for (const [id, files] of covered) {
     for (const file of files) {
       const content = readFileSync(file, 'utf8');
-      if (!content.includes(`[AC-${id}]`)) {
+      const titles = testTitlesIn(content);
+      if (!titles.some((t) => t.startsWith(`[AC-${id}]`))) {
         violations.push(`${file} is named for AC-${id} but no test title is prefixed [AC-${id}]`);
       }
     }

@@ -35,4 +35,10 @@ describe('scripts/check-coverage.mjs', () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('AC-001 has no matching test file');
   });
+
+  it('fails when [AC-0NN] appears only in a comment, not as a real test title', () => {
+    const result = run('stray-mention');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('no test title is prefixed [AC-001]');
+  });
 });
