@@ -532,3 +532,27 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-003@543975621a8963c0266cb9b4977c35b0bd902072]
     note: "references DOCUMENT_CONVENTIONS.md (DOC-027), handoff fallback naming for no-DOC-id content"
+  - id: DOC-005
+    path: CLAUDE.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-006
+    path: .codex/config.toml
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-007
+    path: .claude/settings.json
+    commit: 99198c52e54432195761e2e8359c0a25f3775d03
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-008
+    path: product/PRODUCT.md
+    commit: 33acf83670c95fa774e1e40d6959247593964ea6
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
