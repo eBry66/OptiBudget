@@ -490,3 +490,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9, DOC-014@38ae74e662d50e0e665e61787778ec1abe1ae8a3, DOC-019@20e8270fcd351363228f8b53d319e0ddd3633f90, DOC-020@a45c39a4bda600f7bfcb935bb468c9e2d79fb6d4, DOC-021@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-022@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-023@2e63bd268323d46d81f2719c3ce339bee468c0f6, DOC-025@2ba7fc9eb18b67c22f568e9fcc1a36d07eb91ca4]
     note: "re-approved: no content change, prerequisite DOC-020 revised"
+  - id: DOC-017
+    path: engineering/TESTING.md
+    commit: ca421f087b40d2f8d19dd69a23a325e50a1df319
+    approved_at: 2026-08-14
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9]
+    note: "task-scoped coverage, AC-coverage/integration-flow test classes, functional-test terminology corrected, release coverage non-blocking"
