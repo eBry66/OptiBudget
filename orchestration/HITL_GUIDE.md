@@ -732,7 +732,7 @@ ask.
 
 ### Where
 
-`orchestration/handoffs/session-<YYYY-MM-DD>-<slug>.md`, per `AGENTS.md`'s
+`orchestration/handoffs/sessions/session-<YYYY-MM-DD>-<slug>.md`, per `AGENTS.md`'s
 handoff-fallback rule (no DOC-id or task-id applies to an entire chat
 session). `<slug>` is `recap`, unless the session was narrowly about one
 topic, in which case name it after that topic.
@@ -754,7 +754,7 @@ growing across the day, not a new file per session.
 4. **Remaining work, in order** — numbered, each item stating whether
    it's started, blocked, or not started, and what unblocks it.
 5. **How to resume** — the exact phrase to type in the new conversation.
-   Always: "OptiBudget: read orchestration/handoffs/session-<date>.md,
+   Always: "OptiBudget: read orchestration/handoffs/sessions/session-<date>.md,
    then tell me what you'd do next." Never a paraphrase of this, never
    "pick up where we left off" or similar — an exact, repeatable phrase
    is what makes resumption reliable.
@@ -771,11 +771,11 @@ it never reaches `git add`:
 
 ```powershell
 $newSection = Get-Content -Path handoff_append_scratch.md -Raw
-$current = [System.IO.File]::ReadAllText("orchestration\handoffs\session-<date>.md").TrimEnd()
+$current = [System.IO.File]::ReadAllText("orchestration\handoffs\sessions\session-<date>.md").TrimEnd()
 $full = $current + "`r`n`r`n" + $newSection.TrimStart()
-[System.IO.File]::WriteAllText("orchestration\handoffs\session-<date>.md", $full, [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText("orchestration\handoffs\sessions\session-<date>.md", $full, [System.Text.UTF8Encoding]::new($false))
 Remove-Item handoff_append_scratch.md
-git diff -- orchestration/handoffs/session-<date>.md
+git diff -- orchestration/handoffs/sessions/session-<date>.md
 ```
 
 Verify the diff before committing, every time, same as any other

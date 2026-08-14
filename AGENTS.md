@@ -18,7 +18,7 @@ here. Project-specific rules live in `orchestration/PROJECT_RULES.md`.
 5. project.state.yaml, if it exists. During gate 0 it does not.
 6. orchestration/bootstrap.yaml
 7. The task file named by project.state.yaml, if any.
-8. The newest file in orchestration/handoffs/ that matches the current
+8. The newest file in orchestration/handoffs/tasks/ that matches the current
    item as determined by steps 4-6 above — not simply the most recently
    modified file in that folder, since a handoff for an already-approved
    document can be newer than one for the document now active.
@@ -66,7 +66,7 @@ for the HITL to write a task YAML — it drafts one when instructed to.
 
 ## Handoff
 At the end of any session, write assumptions, open questions, and blockers to
-`orchestration/handoffs/<doc-or-task-id>-<n>.md`. If the content has neither a
-DOC id nor a task id, use
-`orchestration/handoffs/session-<YYYY-MM-DD>-<slug>.md` instead. Narrative
-belongs there and nowhere else.
+`orchestration/handoffs/tasks/<doc-or-task-id>-<n>.md`. If the content has
+neither a DOC id nor a task id, use
+`orchestration/handoffs/sessions/session-<YYYY-MM-DD>-<slug>.md` instead.
+Narrative belongs there and nowhere else.
