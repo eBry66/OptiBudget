@@ -472,3 +472,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "repair: two entries omitted from prior approved commit, now restored and verified via diff"
+  - id: DOC-017
+    path: engineering/TESTING.md
+    commit: c265805c904ac02671a3f90238768c688aa0e653
+    approved_at: 2026-08-14
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9]
+    note: "re-approved: content-identical revert of accidental draft, no actual change from prior approved version"
