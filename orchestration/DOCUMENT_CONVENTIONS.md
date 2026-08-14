@@ -47,3 +47,32 @@ before doing anything" list, `orchestration/BOOTSTRAP.md`'s session-
 opening block) includes this document. A vendor drafting or reviewing any
 structured document checks this file's rules apply, then checks the
 governed document's own `## Format` section for the specifics.
+
+## Verification method
+
+Two standing rules for how any text edit in this repository is made and
+checked, established after repeated, verified failures of the informal
+alternatives during 2026-08-14 governance work.
+
+**Writing:** never place a blank line inside a PowerShell here-string
+(`@'...'@`) that will be pasted into an interactive console session.
+Paste handling has silently dropped interior blank lines multiple times,
+even though the write call itself (`WriteAllText`, `AppendAllText`)
+executed without error. Where a blank line is structurally required,
+build it explicitly in code — split the content at that point and join
+the parts with an explicit line-break sequence — rather than including it
+literally inside the here-string body.
+
+**Verifying:** after any text edit, confirm the result with
+`Select-String -Path <file> -Pattern "<text near the edit>" -Context 2,2`
+at every point a blank line or other whitespace-sensitive join was made.
+Do not rely on `git diff` alone — its hunk-context trimming can make a
+missing blank line indistinguishable from a correctly present one when
+read casually. Do not rely on `Get-Content -Raw` pasted into chat —
+console rendering has produced both corrupted characters and apparently
+missing blank lines that were not actually present in the file.
+`Select-String -Context` has been reliable without exception; the other
+two have each been misleading at least once.
+
+This applies to every text edit in this repository, not only cases where
+a problem is suspected.
