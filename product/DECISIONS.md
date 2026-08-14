@@ -285,3 +285,36 @@ file, once merged, is the confirmation it was built correctly.
 unit check red due to pre-existing check-coverage.mjs defect (logged
 2026-08-13), not caused by this task. validate-state and validate-task
 both green, Codex-reviewed.
+
+---
+
+## 2026-08-14 — Dependency tracking: two-phase approach, append-only log now, DOC-id status deferred to v2
+
+**Decided:** runtime dependency additions are tracked in a new append-only
+file, `engineering/DEPENDENCIES.md`, referenced from
+`orchestration/PROJECT_RULES.md`, starting immediately. It is not entered
+into `orchestration/bootstrap.yaml` as a DOC-id in this revision. Whether
+it should receive full DOC-id treatment — individual `next.mjs approve`
+events, staleness tracking — is deferred to v2 planning, when `SCOPE.md`
+and related documents are reopened for provisioning and co-ownership
+anyway.
+
+**Why:** a DOC-id today would reopen gate 0's closed document graph for a
+file whose shape (continuously appended, not periodically re-approved)
+doesn't match what `bootstrap.yaml`'s approval model is built for — the
+same reasoning already applied to `DECISIONS.md` and `approvals.yaml`,
+neither of which are DOC-ids. Deferring tracking itself until v2, instead
+of only deferring the DOC-id question, would leave every dependency added
+during Release 1 unlogged. The two questions — when to start tracking,
+and whether tracking should eventually be gate-0-graph-enforced — are
+separable, and only the second is deferred.
+
+**Rules out:** treating the absence of a DOC-id as absence of tracking.
+`engineering/DEPENDENCIES.md` is mandatory from Release 1 onward per
+`orchestration/PROJECT_RULES.md`'s constraints, independent of its status
+in `bootstrap.yaml`.
+
+**Revisit when:** v2 planning reopens `product/SCOPE.md`. At that point,
+decide explicitly whether `engineering/DEPENDENCIES.md` graduates to a
+DOC-id with individual approval, or remains append-only content — not by
+default, but as its own stated decision.
