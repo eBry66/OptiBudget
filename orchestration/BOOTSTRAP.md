@@ -6,7 +6,7 @@ Read in this order and nothing else yet:
    content
 4. orchestration/bootstrap.yaml
 5. project.state.yaml, if it exists
-6. the newest file in orchestration/handoffs/ for the current item
+6. the newest file in orchestration/handoffs/tasks/ for the current item
 
 Then state back to me: current gate, active DOC id or task id, the paths you
 are allowed to write, and the single next action. Quote the SENTINEL line from

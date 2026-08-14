@@ -598,3 +598,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: []
     note: "handoff paths updated for tasks/sessions folder split, matches DOC-004"
+  - id: DOC-027
+    path: orchestration/DOCUMENT_CONVENTIONS.md
+    commit: 3e14714cca35e9d9f8b21bd17e3aa8fa53b1ba27
+    approved_at: 2026-08-14
+    based_on: []
+    note: "codifies this session's repeated blank-line failures into a standing rule: no blank lines inside here-strings, Select-String -Context as the verification standard"
