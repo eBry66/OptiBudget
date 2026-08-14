@@ -502,3 +502,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-017@ca421f087b40d2f8d19dd69a23a325e50a1df319, DOC-018@c068db5475208bb7702d074c23df93f0bbfb7420]
     note: "re-approved: no content change, prerequisite DOC-017 revised"
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    commit: 5a4e4b3d2e5b7604a1d335918a1407089744c352
+    approved_at: 2026-08-14
+    based_on: [DOC-004@553bcacf542290b76cc0805bcc213ef590aae7d0, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "RLS regression full-repo not table-scoped, threat-model trigger corrected to household-reach not column data type"
