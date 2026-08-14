@@ -2,4 +2,4 @@
 
 Re-approve every document listed here before advancing.
 
-- DOC-024  project.state.yaml  [stale] prerequisite moved: DOC-022
+- DOC-010  product/DECISIONS.md  [modified] changed since approval; re-approve
