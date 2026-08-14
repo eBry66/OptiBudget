@@ -460,3 +460,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-004@553bcacf542290b76cc0805bcc213ef590aae7d0, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "execution tiers, solo-repo merge authorization, dependency tracking"
+  - id: DOC-024
+    path: project.state.yaml
+    commit: 0239119b581e7ae8f91ab218715089befda76f83
+    approved_at: 2026-08-14
+    based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9, DOC-014@38ae74e662d50e0e665e61787778ec1abe1ae8a3, DOC-019@20e8270fcd351363228f8b53d319e0ddd3633f90, DOC-020@e1ba1b85a7fd65d17f33e78c0e857972691648f4, DOC-021@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-022@449b010681c88fbb7a99f4fd85cba6785d8b2e75, DOC-023@2e63bd268323d46d81f2719c3ce339bee468c0f6, DOC-025@2ba7fc9eb18b67c22f568e9fcc1a36d07eb91ca4]
+    note: "re-approved: no content change, prerequisite DOC-023 revised"
