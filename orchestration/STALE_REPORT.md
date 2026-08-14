@@ -2,4 +2,4 @@
 
 Re-approve every document listed here before advancing.
 
-- DOC-017  engineering/TESTING.md  [modified] changed since approval; re-approve
+- DOC-020  engineering/CHECK_MAP.md  [stale] prerequisite moved: DOC-017
