@@ -436,3 +436,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-13
     based_on: [DOC-004@553bcacf542290b76cc0805bcc213ef590aae7d0]
     note: "deny rule was blocking legitimate scripts/ writes; narrowed to the two files it was actually meant to protect per §4.8"
+  - id: DOC-010
+    path: product/DECISIONS.md
+    commit: a4f44140f6cb56c92456dfdb8f1983d0c3806eff
+    approved_at: 2026-08-14
+    based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "resting-state supersession, coverage terminology, dependency-tracking decision"
