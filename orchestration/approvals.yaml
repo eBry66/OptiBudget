@@ -556,3 +556,15 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
     note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    commit: 2d609bce0d9327ecbfb84d6410065873ae5f564d
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3]
+    note: "references DOCUMENT_CONVENTIONS.md (DOC-027), matches AGENTS.md's read-list addition"
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    commit: 5a4e4b3d2e5b7604a1d335918a1407089744c352
+    approved_at: 2026-08-14
+    based_on: [DOC-004@4a98ba3361693cdc9f9cfba3f1666f3707553eb3, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
