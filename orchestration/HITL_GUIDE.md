@@ -714,6 +714,78 @@ Continuity lives in Git, not in chat memory [M].
 
 If the new vendor's summary is wrong, the problem is in your repository files, not in the vendor. Fix the files.
 
+## 9a. Ending and Resuming a Claude Chat Session
+
+Claude Chat sessions are stateless, same as coder sessions (section 9),
+but the trigger and the content differ: this is not a mid-task vendor
+switch, it's the HITL choosing to end a coordination session, for any
+reason, and continue later — possibly hours or days later, possibly after
+several other Claude Chat sessions in between.
+
+### When
+
+Any of: the HITL wants to switch conversations, a session has run long,
+or the HITL asks Claude to prepare for continuation. Do not wait for an
+explicit "write a handoff" request every time — if a session has covered
+substantive committed work, offer to write one before the HITL has to
+ask.
+
+### Where
+
+`orchestration/handoffs/session-<YYYY-MM-DD>-<slug>.md`, per `AGENTS.md`'s
+handoff-fallback rule (no DOC-id or task-id applies to an entire chat
+session). `<slug>` is `recap`, unless the session was narrowly about one
+topic, in which case name it after that topic.
+
+If a file at that exact date already exists (a second session same day),
+append to it — do not create `session-<date>-2.md` or similar. Use the
+append method below every time, with no variation: this is the same file,
+growing across the day, not a new file per session.
+
+### Structure — fixed, every time
+
+1. **Verified repo state** — output of `next.mjs check`, current branch,
+   anything push/protection-related worth restating.
+2. **Completed this session** — one paragraph per substantive piece of
+   work, referencing DOC ids where they exist.
+3. **Process lessons** — anything discovered about the tooling, the
+   procedure, or a recurring mistake, stated as a rule for next time, not
+   just a narrative of what happened.
+4. **Remaining work, in order** — numbered, each item stating whether
+   it's started, blocked, or not started, and what unblocks it.
+5. **How to resume** — the exact phrase to type in the new conversation.
+   Always: "OptiBudget: read orchestration/handoffs/session-<date>.md,
+   then tell me what you'd do next." Never a paraphrase of this, never
+   "pick up where we left off" or similar — an exact, repeatable phrase
+   is what makes resumption reliable.
+
+### How to append — the exact method, no variation
+
+PowerShell here-strings with a blank line inside them are not reliable
+for appends in this environment (`git diff` verification has caught this
+failing more than once). Always build the join explicitly, using a
+disposable scratch file for the new content, deleted immediately after
+use — this scratch file is not itself a governed artifact and is not
+subject to `orchestration/DOCUMENT_CONVENTIONS.md`'s naming rules, since
+it never reaches `git add`:
+
+```powershell
+$newSection = Get-Content -Path handoff_append_scratch.md -Raw
+$current = [System.IO.File]::ReadAllText("orchestration\handoffs\session-<date>.md").TrimEnd()
+$full = $current + "`r`n`r`n" + $newSection.TrimStart()
+[System.IO.File]::WriteAllText("orchestration\handoffs\session-<date>.md", $full, [System.Text.UTF8Encoding]::new($false))
+Remove-Item handoff_append_scratch.md
+git diff -- orchestration/handoffs/session-<date>.md
+```
+
+Verify the diff before committing, every time, same as any other
+document.
+
+### What this replaces
+
+Any prior improvised handoff procedure in this project's history. This
+section is now the only source of truth for it.
+
 ## 10. Gate 0 Exit
 
 Gate 0 is complete when all of the following are true:

@@ -580,3 +580,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
     note: "Codex review of engineering/DEPENDENCIES.md recorded, no violations"
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    commit: 597739e485ddc6ecaa47d0650d44de7bc4d29e72
+    approved_at: 2026-08-14
+    based_on: []
+    note: "formalized recurring handoff procedure: when, where, fixed structure, exact append method, exact resume phrase - replaces ad hoc improvisation"
