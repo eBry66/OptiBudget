@@ -526,3 +526,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: []
     note: "document-contract meta-rules: self-containment, heading nesting, field lists, ID grammar, discovery"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 4a98ba3361693cdc9f9cfba3f1666f3707553eb3
+    approved_at: 2026-08-14
+    based_on: [DOC-003@543975621a8963c0266cb9b4977c35b0bd902072]
+    note: "references DOCUMENT_CONVENTIONS.md (DOC-027), handoff fallback naming for no-DOC-id content"
