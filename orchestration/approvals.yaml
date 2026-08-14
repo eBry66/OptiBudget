@@ -478,3 +478,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-013@5624b8dbef88bbc3ab431c32cb98f02862fbb3a9]
     note: "re-approved: content-identical revert of accidental draft, no actual change from prior approved version"
+  - id: DOC-020
+    path: engineering/CHECK_MAP.md
+    commit: a45c39a4bda600f7bfcb935bb468c9e2d79fb6d4
+    approved_at: 2026-08-14
+    based_on: [DOC-017@c265805c904ac02671a3f90238768c688aa0e653, DOC-018@c068db5475208bb7702d074c23df93f0bbfb7420]
+    note: "revision trigger fulfilled: validate-state, validate-task, check-coverage.mjs all delivered and mapped"
