@@ -592,3 +592,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: [DOC-003@543975621a8963c0266cb9b4977c35b0bd902072]
     note: "handoff paths updated for tasks/sessions folder split"
+  - id: DOC-026
+    path: orchestration/HITL_GUIDE.md
+    commit: e369b9a8f7b2c2e46fa60d09ab24b326823124be
+    approved_at: 2026-08-14
+    based_on: []
+    note: "handoff paths updated for tasks/sessions folder split, matches DOC-004"
