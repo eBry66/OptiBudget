@@ -37,6 +37,19 @@ Tier 2 unconditionally — see "Execution tiers" below. Every RLS-touching task
 after that runs at whatever tier the rules below assign it; RLS does not by
 itself force repeated HITL involvement.
 
+Threat-model review is triggered by household-scoped reach, not by column
+data type. Any new table that carries or reaches household-scoped data, or
+any change to an existing household-reach path, a shared authorization
+primitive (`household_member_of()` or equivalent), an RLS policy, or a
+`SECURITY DEFINER` function requires a `THREAT_MODEL.md` (DOC-016)
+addendum, reviewed and re-approved, before its RLS policy task can be Tier
+2 approved. A table with no monetary or personally identifying column is
+not exempt on that basis — `household_members` itself carries no monetary
+field and is the table every other policy ultimately reads through
+`household_member_of()`; correctness of that single function affects
+every table it protects, which is exactly the reach the trigger exists to
+catch, not the data type any one table happens to store.
+
 ## Execution tiers
 
 Two tiers, applied per task, stated in the task YAML, and structurally
@@ -75,6 +88,16 @@ own task, not assembled inside this document.
 
 A task qualifies for Tier 1 only if all of the following hold:
 - It writes only inside its own declared `allowed_paths`.
+- If it modifies any table with an existing RLS policy, any query path
+  reaching such a table, a shared authorization primitive
+  (`household_member_of()` or equivalent), or a `SECURITY DEFINER`
+  function, the task's CI run must include the full repository-wide RLS
+  test suite, not only tests scoped to the table or function it directly
+  touches, and that suite must pass. `household_member_of()` is shared by
+  every table's policy; a change verified only against the tables a task
+  directly modifies can still break every other table silently. A new
+  failure anywhere in that suite blocks Tier-1 merge regardless of the
+  task's own tests passing.
 - It does not touch `approvals.yaml`, `bootstrap.yaml`,
   `project.state.yaml`, `template.lock`, `template.manifest.yaml`, or any
   document under `product/`.
@@ -179,4 +202,3 @@ addressed here.
 
 - Claude Code (implement), OpenAI Codex (review). The vendor that drafted an
   artifact must not review it (HITL_GUIDE section 7).
-  
