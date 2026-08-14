@@ -104,3 +104,7 @@ documents:
     path: orchestration/HITL_GUIDE.md
     owner: hitl
     depends_on: []
+  - id: DOC-027
+    path: orchestration/DOCUMENT_CONVENTIONS.md
+    owner: hitl
+    depends_on: []
