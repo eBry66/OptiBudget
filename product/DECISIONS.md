@@ -382,3 +382,29 @@ product/engineering-phase decision, not a rider on this correction.
 **Revisit when:** the coverage-contract redesign (task-scoped vs.
 release-scoped vs. infrastructure-exempt) is taken up as its own piece of
 work — queued by this entry, not scheduled.
+
+---
+
+## 2026-08-14 — engineering/DEPENDENCIES.md: Codex review, no violations
+
+**Decided:** `engineering/DEPENDENCIES.md` accepted as compliant.
+Codex-reviewed against three prerequisites: `orchestration/
+DOCUMENT_CONVENTIONS.md` (confirmed: all entry headings `###`, all eight
+fields present in exact order with exact labels, `Added by` values all
+valid), `product/DECISIONS.md`'s 2026-08-14 two-phase entry (confirmed:
+no DOC-id claimed for itself; its citations of DOC-014/DOC-015 as
+dependency-selection sources are references, not a DOC-id claim, and are
+not a violation), and `orchestration/PROJECT_RULES.md`'s dependency
+constraint (confirmed: correct path, all required fields present).
+
+**Why:** closes the review this file was owed before point 6 (coverage
+machinery) builds on it. The file was accidentally committed to `main`
+before Codex review earlier in this session (corrected in a follow-up
+commit); this entry records the review that should have preceded that
+commit.
+
+**Rules out:** treating this file as unreviewed. No further review is
+required unless its content changes.
+
+**Revisit when:** the file's content changes — a new dependency category,
+a format revision, or similar.
