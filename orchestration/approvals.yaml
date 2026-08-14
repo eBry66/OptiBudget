@@ -604,3 +604,39 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: []
     note: "codifies this session's repeated blank-line failures into a standing rule: no blank lines inside here-strings, Select-String -Context as the verification standard"
+  - id: DOC-022
+    path: orchestration/BOOTSTRAP.md
+    commit: a57a1d9d4f5966a19cccaa10909b429c37c048d0
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff]
+    note: "handoff path updated to tasks/ for folder split, verified via Select-String"
+  - id: DOC-005
+    path: CLAUDE.md
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-006
+    path: .codex/config.toml
+    commit: 449b010681c88fbb7a99f4fd85cba6785d8b2e75
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-007
+    path: .claude/settings.json
+    commit: 99198c52e54432195761e2e8359c0a25f3775d03
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-008
+    path: product/PRODUCT.md
+    commit: 33acf83670c95fa774e1e40d6959247593964ea6
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
+  - id: DOC-023
+    path: orchestration/PROJECT_RULES.md
+    commit: 5a4e4b3d2e5b7604a1d335918a1407089744c352
+    approved_at: 2026-08-14
+    based_on: [DOC-004@104212ce2f9a4ebde4ad96bb987f83fe42dc6aff, DOC-008@33acf83670c95fa774e1e40d6959247593964ea6]
+    note: "re-approved: no content change, prerequisite DOC-004 revised"
