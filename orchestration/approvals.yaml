@@ -586,3 +586,9 @@ approvals:  - id: DOC-001
     approved_at: 2026-08-14
     based_on: []
     note: "formalized recurring handoff procedure: when, where, fixed structure, exact append method, exact resume phrase - replaces ad hoc improvisation"
+  - id: DOC-004
+    path: AGENTS.md
+    commit: 104212ce2f9a4ebde4ad96bb987f83fe42dc6aff
+    approved_at: 2026-08-14
+    based_on: [DOC-003@543975621a8963c0266cb9b4977c35b0bd902072]
+    note: "handoff paths updated for tasks/sessions folder split"
