@@ -27,16 +27,33 @@ Every test title must begin with: `[AC-0NN]`
 
 ## Coverage
 
-A pull request fails if any AC id in `product/ACCEPTANCE.md` has no
-matching test file. This is `scripts/check-coverage.mjs`'s job (task-001,
-section 10), and it has no specification to run against without the exact
-string format above.
+Coverage is task-scoped, not release-wide. Each task YAML declares the
+acceptance criteria it implements in a `claims_acs` field — a list of AC
+ids, or `claims_acs: []` for a task that implements none (infrastructure,
+tooling, governance-document work).
+
+A pull request fails if any AC id listed in its task's `claims_acs` has no
+matching test file. An AC id not claimed by the current task is not
+checked by this PR's `unit` job, regardless of whether it has a test
+elsewhere.
+
+`claims_acs: []` is not the same as an empty or missing field — a task
+YAML must state one or the other explicitly. A missing field is a task
+YAML defect, not an exemption, and `validate-task.mjs` must reject it.
 
 A single test file may cover more than one acceptance criterion where the
 criteria describe the same operation from different angles. Name it after
 whichever AC id is primary; state the others in the test's own comments.
-Every AC id, without exception, needs at least one test file naming it
-directly — there is no "covered indirectly" exemption.
+Every AC id claimed by a task, without exception, needs at least one test
+file naming it directly — there is no "covered indirectly" exemption.
+
+## Release-wide coverage — not yet defined
+
+Task-scoped coverage does not, by itself, guarantee that a release's full
+AC set (per `product/SCOPE.md`) is covered before that release ships. That
+check does not exist yet and is out of scope for this revision — logged as
+open work, not solved here. Until it exists, release readiness against
+`ACCEPTANCE.md` coverage is a manual HITL check, not an automated gate.
 
 ## What green does not mean
 
