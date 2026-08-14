@@ -318,3 +318,67 @@ in `bootstrap.yaml`.
 decide explicitly whether `engineering/DEPENDENCIES.md` graduates to a
 DOC-id with individual approval, or remains append-only content — not by
 default, but as its own stated decision.
+
+---
+
+## 2026-08-14 — project.state.yaml's resting-state allowed_paths clause, corrected: the 2026-08-13 entry is superseded
+
+**Decided:** the 2026-08-13 entry's `allowed_paths: []` clause for resting
+state is superseded. The existing, unconditional allowed_paths-non-empty
+check in `validate-state.mjs` was retained through task-002, exactly as
+specified and tested in `orchestration/tasks/task-002.yml` (see its notes
+and the `resting-empty-allowed-paths.state.yaml` fixture, which asserts
+FAIL). Resting state is identified by `active_task: none`, `attempt: 0`,
+and `authorized_branch: main` only; `allowed_paths` remains non-empty in
+both the resting and active shapes.
+
+**Why:** task-002's accepted specification deliberately diverged from the
+08-13 entry's `allowed_paths: []` clause, but the divergence was never
+logged as its own decision, leaving `DECISIONS.md` and the shipped code
+disagreeing. Discovered during cross-vendor review of the
+`PROJECT_RULES.md` Tier-1 revision (2026-08-14), not from any live defect
+in `validate-state.mjs`, `project.state.yaml`, or their tests — all three
+conform to the actually-accepted task-002 design.
+
+**Rules out:** treating the 08-13 entry's `allowed_paths: []` language as
+current. Also establishes, going forward: an accepted task specification
+that intentionally supersedes a standing `DECISIONS.md` entry must be
+reconciled with a new entry before the task is considered closed — a
+task's own acceptance under `HITL_GUIDE.md` §15 is not itself a substitute
+for that reconciliation.
+
+**Revisit when:** never automatically — this corrects the record rather
+than deferring an open question. If the underlying design (unconditional
+`allowed_paths`) is itself reconsidered later, that is a new decision, not
+a revision of this one.
+
+---
+
+## 2026-08-14 — check-coverage.mjs terminology corrected: behaving to spec, not defective; the open question is contract design
+
+**Decided:** the 2026-08-14 task-002 acceptance entry's description of the
+red `unit` check as a "pre-existing check-coverage.mjs defect" is
+corrected. `check-coverage.mjs` implements `engineering/TESTING.md`'s
+coverage contract exactly as written: an unconditional requirement that
+every AC id in `product/ACCEPTANCE.md` have a matching test file, with no
+task-scoped or infrastructure exemption. Task-002 maps to zero AC ids, so
+the red result was `TESTING.md`'s contract operating as specified, not a
+script malfunction.
+
+**Why:** discovered during cross-vendor review of the `PROJECT_RULES.md`
+Tier-1 revision. Calling the script "defective" mischaracterises
+`engineering/TESTING.md` (DOC-017, HITL-owned) and
+`engineering/CHECK_MAP.md`'s coverage design, and risks a future fix
+aimed at the wrong artifact.
+
+**Rules out:** any future work "fixing" `check-coverage.mjs` to resolve
+this specific class of red check — the script is correct against its
+current specification. The open question is whether
+`engineering/TESTING.md`'s coverage contract should distinguish
+task/PR-scoped coverage, release-scoped coverage, and infrastructure
+tasks that implement no ACs. That is unresolved and requires its own
+product/engineering-phase decision, not a rider on this correction.
+
+**Revisit when:** the coverage-contract redesign (task-scoped vs.
+release-scoped vs. infrastructure-exempt) is taken up as its own piece of
+work — queued by this entry, not scheduled.
