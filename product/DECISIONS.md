@@ -408,3 +408,18 @@ required unless its content changes.
 
 **Revisit when:** the file's content changes — a new dependency category,
 a format revision, or similar.
+## 2026-08-15
+Decision: Confirmed live branch-protection ruleset on `main` via `gh api
+repos/eBry66/OptiBudget/branches/main/protection`. Required status checks
+are empty (`contexts: []`) — no CI check, including `unit`, is actually
+enforced at merge time, contrary to what `project.state.yaml`'s
+`required_checks` list implies. Required approving review count is 0.
+`enforce_admins` is true. Force pushes and branch deletion are blocked.
+Why: repeated `--admin` merge overrides and red `unit` checks were being
+attributed to policy (self-approval deadlock, coverage-check severity)
+rather than checked against the actual GitHub configuration.
+Rules out: treating `project.state.yaml`'s `required_checks` field as
+enforced policy without separately configuring it in GitHub branch
+protection; treating `gh pr merge --admin` as bypassing anything on this
+repo as currently configured, since nothing is currently blocking a plain
+merge.
