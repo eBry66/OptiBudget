@@ -1,9 +1,7 @@
 id: task-001
 branch: task-001-ci-and-validators
 attempt: 1
-claims_acs: []
 allowed_paths:
   - scripts/
-  - src/
 required_checks:
   - unit

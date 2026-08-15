@@ -2,11 +2,13 @@
 // scripts/validate-task.mjs - validates a task YAML against project.state.yaml:
 // (1) the task's id, branch, and attempt equal project.state.yaml's
 //     active_task, authorized_branch, and attempt;
-// (2) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
-// (3) every file the task's diff touches falls within the task's own
+// (2) claims_acs is present, well-formed, and every AC id it names exists
+//     in product/ACCEPTANCE.md;
+// (3) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
+// (4) every file the task's diff touches falls within the task's own
 //     allowed_paths.
 // Zero dependencies.
-// Usage: node scripts/validate-task.mjs [--task <path>] [--state <path>] [--base <ref>]
+// Usage: node scripts/validate-task.mjs [--task <path>] [--state <path>] [--base <ref>] [--acceptance <path>]
 
 import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -35,19 +37,72 @@ function die(msg) {
   process.exit(1);
 }
 
-function readYamlFile(path, label) {
+function readTextFile(path, label) {
   if (!existsSync(path)) die(`${label} does not exist: ${path}`);
   return readFileSync(path, 'utf8');
 }
 
 function parseArgs(argv) {
-  const args = { task: undefined, state: 'project.state.yaml', base: undefined };
+  const args = { task: undefined, state: 'project.state.yaml', base: undefined, acceptance: 'product/ACCEPTANCE.md' };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--task') args.task = argv[++i];
     else if (argv[i] === '--state') args.state = argv[++i];
     else if (argv[i] === '--base') args.base = argv[++i];
+    else if (argv[i] === '--acceptance') args.acceptance = argv[++i];
   }
   return args;
+}
+
+const AC_ID_RE = /^AC-\d{3}$/;
+
+// claims_acs must be either the literal inline empty list (claims_acs: [])
+// or a multi-line "- AC-0NN" block whose every item matches AC_ID_RE
+// exactly - DOC-017's AC id grammar. Bare digits ("001"), lowercase, or any
+// other shape are rejected outright, never silently normalized into a
+// matching id. Returns: undefined (the "claims_acs:" key is absent
+// entirely), the string 'malformed' (the key is present but neither
+// recognized shape - a non-list scalar, or a list with a badly-shaped or
+// zero items), or an array of well-formed ids.
+function extractClaimsAcs(text) {
+  const inline = text.match(/^claims_acs:[ \t]*\[([^\]]*)\][ \t]*(#.*)?$/m);
+  if (inline) {
+    const inner = inline[1].trim();
+    if (inner === '') return [];
+    const items = inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, ''));
+    return items.every((id) => AC_ID_RE.test(id)) ? items : 'malformed';
+  }
+
+  const lines = text.split(/\r?\n/);
+  const headerIdx = lines.findIndex((l) => /^claims_acs:[ \t]*(#.*)?$/.test(l));
+  if (headerIdx !== -1) {
+    const items = [];
+    for (let i = headerIdx + 1; i < lines.length; i++) {
+      const m = lines[i].match(/^[ \t]+-[ \t]+(.+)$/);
+      if (!m) break;
+      items.push(m[1].replace(/[ \t]+#.*$/, '').trim().replace(/^["']|["']$/g, ''));
+    }
+    // A bare "claims_acs:" header with no "- " items beneath it is
+    // malformed, not equivalent to the explicit literal claims_acs: [] -
+    // engineering/TESTING.md requires the literal empty-list form for
+    // "zero AC ids claimed".
+    if (items.length === 0) return 'malformed';
+    return items.every((id) => AC_ID_RE.test(id)) ? items : 'malformed';
+  }
+
+  // claims_acs: <bare scalar> - the key is present but is neither
+  // recognized shape (e.g. claims_acs: not-a-list).
+  if (/^claims_acs:[ \t]*\S/m.test(text)) return 'malformed';
+
+  return undefined;
+}
+
+// Same **AC-0NN** extraction check-coverage.mjs uses to read product/ACCEPTANCE.md.
+function acIdsIn(text) {
+  const ids = new Set();
+  const re = /\*\*AC-(\d{3})\*\*/g;
+  let m;
+  while ((m = re.exec(text))) ids.add(m[1]);
+  return ids;
 }
 
 function isWithinAllowedPaths(file, allowedPaths) {
@@ -76,7 +131,7 @@ function diffFiles(base) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
 
-  const stateText = readYamlFile(args.state, 'state file');
+  const stateText = readTextFile(args.state, 'state file');
   const stateAllowedPaths = extractList(stateText, 'allowed_paths');
   if (stateAllowedPaths === undefined) die(`${args.state} has no allowed_paths list`);
 
@@ -91,7 +146,7 @@ function main() {
     taskPath = `orchestration/tasks/${activeTask}.yml`;
   }
 
-  const taskText = readYamlFile(taskPath, 'task file');
+  const taskText = readTextFile(taskPath, 'task file');
 
   const taskId = extractScalar(taskText, 'id');
   const taskBranch = extractScalar(taskText, 'branch');
@@ -122,6 +177,34 @@ function main() {
     console.error(`INVALID: ${taskPath}`);
     for (const v of identityViolations) console.error(`  - ${v}`);
     process.exit(1);
+  }
+
+  // claims_acs: present as an explicit field (engineering/TESTING.md,
+  // "Coverage") - either a non-empty list of AC ids or the literal empty
+  // list claims_acs: []. A missing field is a task YAML defect, same as a
+  // missing allowed_paths.
+  const claimsAcs = extractClaimsAcs(taskText);
+  if (claimsAcs === undefined) {
+    die(`${taskPath} has no claims_acs field (must be a list of AC ids matching AC-0NN, or the literal empty list claims_acs: [])`);
+  }
+  if (claimsAcs === 'malformed') {
+    die(
+      `${taskPath}'s claims_acs is malformed: every item must match AC-0NN exactly ` +
+      `(e.g. AC-001, not 001 or ac-001), and an empty claim set must be written as ` +
+      `the literal claims_acs: []`
+    );
+  }
+  if (claimsAcs.length > 0) {
+    const acceptanceText = readTextFile(args.acceptance, 'acceptance file');
+    const knownAcIds = acIdsIn(acceptanceText);
+    const unknown = claimsAcs.filter((id) => !knownAcIds.has(id.slice(3)));
+    if (unknown.length) {
+      console.error(`INVALID: ${taskPath}`);
+      for (const id of unknown) {
+        console.error(`  - claims_acs names an AC id that does not exist in ${args.acceptance}: ${id}`);
+      }
+      process.exit(1);
+    }
   }
 
   const taskAllowedPaths = extractList(taskText, 'allowed_paths');
