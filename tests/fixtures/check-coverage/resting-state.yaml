@@ -1,0 +1,10 @@
+version: 1
+gate: 1
+active_task: none
+attempt: 0
+authorized_branch: main
+allowed_paths:
+  - scripts/
+required_checks:
+  - unit
+frozen: false

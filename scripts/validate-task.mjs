@@ -2,11 +2,13 @@
 // scripts/validate-task.mjs - validates a task YAML against project.state.yaml:
 // (1) the task's id, branch, and attempt equal project.state.yaml's
 //     active_task, authorized_branch, and attempt;
-// (2) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
-// (3) every file the task's diff touches falls within the task's own
+// (2) claims_acs is present, well-formed, and every AC id it names exists
+//     in product/ACCEPTANCE.md;
+// (3) the task's allowed_paths is a subset of project.state.yaml's allowed_paths;
+// (4) every file the task's diff touches falls within the task's own
 //     allowed_paths.
 // Zero dependencies.
-// Usage: node scripts/validate-task.mjs [--task <path>] [--state <path>] [--base <ref>]
+// Usage: node scripts/validate-task.mjs [--task <path>] [--state <path>] [--base <ref>] [--acceptance <path>]
 
 import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -35,19 +37,47 @@ function die(msg) {
   process.exit(1);
 }
 
-function readYamlFile(path, label) {
+function readTextFile(path, label) {
   if (!existsSync(path)) die(`${label} does not exist: ${path}`);
   return readFileSync(path, 'utf8');
 }
 
 function parseArgs(argv) {
-  const args = { task: undefined, state: 'project.state.yaml', base: undefined };
+  const args = { task: undefined, state: 'project.state.yaml', base: undefined, acceptance: 'product/ACCEPTANCE.md' };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--task') args.task = argv[++i];
     else if (argv[i] === '--state') args.state = argv[++i];
     else if (argv[i] === '--base') args.base = argv[++i];
+    else if (argv[i] === '--acceptance') args.acceptance = argv[++i];
   }
   return args;
+}
+
+// claims_acs may be written as the literal inline empty list (claims_acs: [])
+// or as a multi-line "- AC-0NN" block; both are valid per engineering/TESTING.md.
+// Returns undefined when the field is absent entirely.
+function extractClaimsAcs(text) {
+  const inline = text.match(/^claims_acs:[ \t]*\[([^\]]*)\][ \t]*(#.*)?$/m);
+  if (inline) {
+    const inner = inline[1].trim();
+    if (inner === '') return [];
+    return inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+  }
+  return extractList(text, 'claims_acs');
+}
+
+function normalizeAcId(raw) {
+  const m = raw.match(/^(?:AC-)?(\d{3})$/);
+  return m ? m[1] : raw;
+}
+
+// Same **AC-0NN** extraction check-coverage.mjs uses to read product/ACCEPTANCE.md.
+function acIdsIn(text) {
+  const ids = new Set();
+  const re = /\*\*AC-(\d{3})\*\*/g;
+  let m;
+  while ((m = re.exec(text))) ids.add(m[1]);
+  return ids;
 }
 
 function isWithinAllowedPaths(file, allowedPaths) {
@@ -76,7 +106,7 @@ function diffFiles(base) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
 
-  const stateText = readYamlFile(args.state, 'state file');
+  const stateText = readTextFile(args.state, 'state file');
   const stateAllowedPaths = extractList(stateText, 'allowed_paths');
   if (stateAllowedPaths === undefined) die(`${args.state} has no allowed_paths list`);
 
@@ -91,7 +121,7 @@ function main() {
     taskPath = `orchestration/tasks/${activeTask}.yml`;
   }
 
-  const taskText = readYamlFile(taskPath, 'task file');
+  const taskText = readTextFile(taskPath, 'task file');
 
   const taskId = extractScalar(taskText, 'id');
   const taskBranch = extractScalar(taskText, 'branch');
@@ -122,6 +152,27 @@ function main() {
     console.error(`INVALID: ${taskPath}`);
     for (const v of identityViolations) console.error(`  - ${v}`);
     process.exit(1);
+  }
+
+  // claims_acs: present as an explicit field (engineering/TESTING.md,
+  // "Coverage") - either a non-empty list of AC ids or the literal empty
+  // list claims_acs: []. A missing field is a task YAML defect, same as a
+  // missing allowed_paths.
+  const claimsAcs = extractClaimsAcs(taskText);
+  if (claimsAcs === undefined) {
+    die(`${taskPath} has no claims_acs field (must be a list of AC ids or the literal empty list claims_acs: [])`);
+  }
+  if (claimsAcs.length > 0) {
+    const acceptanceText = readTextFile(args.acceptance, 'acceptance file');
+    const knownAcIds = acIdsIn(acceptanceText);
+    const unknown = claimsAcs.filter((raw) => !knownAcIds.has(normalizeAcId(raw)));
+    if (unknown.length) {
+      console.error(`INVALID: ${taskPath}`);
+      for (const raw of unknown) {
+        console.error(`  - claims_acs names an AC id that does not exist in ${args.acceptance}: ${raw}`);
+      }
+      process.exit(1);
+    }
   }
 
   const taskAllowedPaths = extractList(taskText, 'allowed_paths');

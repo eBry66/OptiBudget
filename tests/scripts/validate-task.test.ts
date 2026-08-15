@@ -28,6 +28,7 @@ const TASK_777 = [
   'id: task-777',
   'branch: task-777-example',
   'attempt: 1',
+  'claims_acs: []',
   'allowed_paths:',
   '  - scripts/',
   '',
@@ -70,6 +71,18 @@ describe('scripts/validate-task.mjs', () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('allowed_paths escapes');
     expect(result.stderr).toContain('src/');
+  });
+
+  it('fails when a task YAML has no claims_acs field at all', () => {
+    const result = run('missing-claims-acs-task.yml');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('claims_acs');
+  });
+
+  it('fails when claims_acs names an AC id absent from product/ACCEPTANCE.md, naming it', () => {
+    const result = run('unknown-ac-task.yml', ['--acceptance', `${FIXTURES}ACCEPTANCE.md`]);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('AC-999');
   });
 
   it('passes when allowed_paths is a subset and the diff (here, empty) stays within it', () => {
