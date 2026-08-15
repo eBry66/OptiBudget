@@ -1,0 +1,132 @@
+id: task-004 # must equal project.state.yaml's active_task
+branch: task-004-claims-acs-coverage # must equal project.state.yaml's authorized_branch
+attempt: 1 # must equal project.state.yaml's attempt
+description: >
+  Brings scripts/check-coverage.mjs and scripts/validate-task.mjs in line
+  with the task-scoped claims_acs contract engineering/TESTING.md (DOC-017,
+  commit ca421f0) already states. check-coverage.mjs currently scans every
+  AC id in product/ACCEPTANCE.md unconditionally, which is why the unit
+  required check is red on every PR regardless of what that PR touches.
+  This task makes it check only the AC ids the active task's claims_acs
+  lists, and makes validate-task.mjs enforce that claims_acs is present,
+  well-formed, and only names AC ids that actually exist.
+
+allowed_paths:
+  - scripts/
+  - tests/
+
+required_checks:
+  - validate-state
+  - validate-task
+  - unit
+
+notes:
+  - >
+    orchestration/tasks/task-004.yml itself sits outside allowed_paths by
+    design, same as task-001.yml and task-002.yml before it: it is the task
+    definition, not a deliverable this task produces.
+  - >
+    task-003 is not reused here. It is already earmarked, in task-002.yml's
+    notes and in orchestration/handoffs/sessions/session-2026-08-14.md, for
+    extending scripts/next.mjs with open-task/close-task automation — a
+    separate, still-not-started piece of work. This task is numbered
+    task-004 to avoid colliding with that reservation, per explicit HITL
+    confirmation.
+  - >
+    orchestration/PROJECT_RULES.md's "Deferred governance task" section
+    currently describes engineering/TESTING.md's coverage contract as not
+    distinguishing task-scoped from release-scoped coverage. That paragraph
+    predates DOC-017's claims_acs revision (commit ca421f0) landing before
+    PROJECT_RULES.md's own last edit (commit 5a4e4b3), and is stale — it
+    does not describe TESTING.md as currently committed, which this task's
+    scope is drawn from. Correcting that paragraph is PROJECT_RULES.md
+    content and Tier 2 by AGENTS.md's hard rules; this task does not touch
+    it and treats TESTING.md, not that stale paragraph, as authoritative.
+  - >
+    scripts/check-release-coverage.mjs (the release-wide, non-blocking,
+    informational coverage report engineering/TESTING.md's "Release-wide
+    coverage" section describes) is explicitly out of scope. It is a
+    distinct follow-on task, not built here.
+  - >
+    check-coverage.mjs's task resolution mirrors validate-task.mjs's
+    existing pattern exactly, so no .github/workflows/ci.yml change is
+    needed: with no --task flag given, it reads project.state.yaml's
+    active_task and loads orchestration/tasks/<active_task>.yml; when
+    active_task is the literal string "none", it exits 0 with an
+    explanatory message ("resting: active_task is none, nothing to check")
+    instead of requiring every AC id to be covered, matching
+    validate-task.mjs's existing resting-state behavior rather than
+    introducing a different convention for the same state.
+  - >
+    Field-level validation semantics for claims_acs beyond "present,
+    well-formed, ids exist in ACCEPTANCE.md" — for example how an AC id
+    claimed twice across two files is treated, or whether ordering within
+    the list matters — are validate-task.mjs's and check-coverage.mjs's own
+    implementation decisions, established and reviewed when those changes
+    are drafted, not pre-specified here.
+
+deliverables:
+  - path: scripts/check-coverage.mjs
+    description: >
+      Adds task-scoped resolution: with no --task flag, reads
+      project.state.yaml's active_task and loads
+      orchestration/tasks/<active_task>.yml's claims_acs list; with
+      active_task == "none", exits 0 (nothing to check) rather than
+      scanning product/ACCEPTANCE.md. When a task is active, checks only
+      the AC ids in that task's claims_acs against tests/<area>/AC-0NN
+      naming and [AC-0NN]-prefixed test titles — the existing per-file
+      matching logic is unchanged, only the set of AC ids it is run
+      against changes, from "every AC id in ACCEPTANCE.md" to "every AC id
+      in the active task's claims_acs". claims_acs: [] means zero AC ids
+      are checked and the script exits 0. An explicit --claims-acs
+      <path-to-task-yml> flag (or equivalent) remains available for
+      running the check against an arbitrary task file outside the
+      resolved-from-state path, mirroring validate-task.mjs's --task flag.
+
+  - path: scripts/validate-task.mjs
+    description: >
+      Adds a claims_acs check alongside the existing id/branch/attempt and
+      allowed_paths checks: claims_acs must be present as an explicit
+      field (either a non-empty list of AC ids or the literal empty list
+      claims_acs: []) — a missing field is a task YAML defect and fails
+      the same way a missing allowed_paths does today. Every AC id listed
+      is verified to exist in product/ACCEPTANCE.md (using the same
+      **AC-0NN** extraction check-coverage.mjs already uses); an id that
+      does not exist there fails validation with the specific unknown id
+      named in the error.
+
+  - path: tests/
+    description: >
+      Fixture tests proving both new behaviors can fail, not just pass
+      (HITL_GUIDE.md §10):
+        - a fixture task YAML whose claims_acs lists an AC id with no
+          matching AC-coverage test file — check-coverage.mjs must fail,
+          naming that AC id.
+        - a fixture task YAML whose claims_acs AC ids are all satisfied by
+          fixture test files — check-coverage.mjs must pass.
+        - a fixture task YAML with claims_acs: [] — check-coverage.mjs
+          must pass with nothing checked.
+        - a fixture task YAML missing the claims_acs field entirely —
+          validate-task.mjs must fail.
+        - a fixture task YAML whose claims_acs names an AC id absent from
+          the fixture ACCEPTANCE.md — validate-task.mjs must fail, naming
+          that id.
+        - a fixture project.state.yaml with active_task: none — both
+          scripts exit 0 without requiring a task file, consistent with
+          validate-task.mjs's existing resting-state test from task-002.
+
+review:
+  procedure: >
+    HITL_GUIDE.md §7 steps 1-5: the implementing vendor drafts this task
+    YAML and its deliverables; a different vendor reviews both against the
+    prerequisite documents named above (engineering/TESTING.md as
+    currently committed, DOCUMENT_CONVENTIONS.md's field-list rules) and
+    reports violations only.
+  acceptance: >
+    HITL_GUIDE.md §15, not §5. As with task-001 and task-002, there is no
+    Vercel preview URL (no application exists yet) and no AC id in
+    product/ACCEPTANCE.md maps to this infrastructure work, so §15.4 step
+    3 has nothing to check for this task. Every other §15 step applies in
+    full. This task YAML and its deliverables are never entered in
+    orchestration/approvals.yaml and are never approved with
+    `next.mjs approve`.
