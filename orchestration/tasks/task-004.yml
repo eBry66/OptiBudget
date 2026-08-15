@@ -1,6 +1,7 @@
 id: task-004 # must equal project.state.yaml's active_task
 branch: task-004-claims-acs-coverage # must equal project.state.yaml's authorized_branch
 attempt: 1 # must equal project.state.yaml's attempt
+claims_acs: []
 description: >
   Brings scripts/check-coverage.mjs and scripts/validate-task.mjs in line
   with the task-scoped claims_acs contract engineering/TESTING.md (DOC-017,
