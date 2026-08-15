@@ -423,3 +423,24 @@ enforced policy without separately configuring it in GitHub branch
 protection; treating `gh pr merge --admin` as bypassing anything on this
 repo as currently configured, since nothing is currently blocking a plain
 merge.
+## 2026-08-15
+Decision: Investigated the template.lock / template.manifest.yaml
+discrepancy flagged in the prior session handoff. Finding: no
+contradiction. The `dev-template` GitHub repository does not exist under
+this account (confirmed via `gh repo view` 404 and an empty repo listing
+search) — template extraction per HITL_GUIDE.md section 13 has never been
+performed. Both files were created in the same original bootstrap commit
+(449b010, 2026-08-06) and have never been modified since. `template.lock`'s
+placeholder URL and `0.0.0`/`unset` version correctly reflect "never
+synced." `template.manifest.yaml`'s `1.2.0` is a hand-typed seed value
+with no real template repository behind it, not evidence of a completed
+sync.
+Why: closes an open item from the 2026-08-14 session handoff that
+speculated the two files might be contradictory.
+Rules out: editing either file to force agreement, since neither is
+wrong; treating `template_version: 1.2.0` in the manifest as a real,
+synced version going forward without first creating an actual
+`dev-template` repository at that version. Template extraction remains
+undone and unscheduled; per HITL_GUIDE.md 13.1 it is now timely
+(task-002 complete) but is a separate, deliberate decision, not implied
+by this finding.
