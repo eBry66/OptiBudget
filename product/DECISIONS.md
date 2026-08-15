@@ -444,3 +444,16 @@ synced version going forward without first creating an actual
 undone and unscheduled; per HITL_GUIDE.md 13.1 it is now timely
 (task-002 complete) but is a separate, deliberate decision, not implied
 by this finding.
+## 2026-08-15 — task-004 (claims_acs coverage enforcement) merged, PR #29. Accepted:
+
+check-coverage.mjs and validate-task.mjs now enforce task-scoped claims_acs
+per engineering/TESTING.md (DOC-017), replacing unconditional full-
+ACCEPTANCE.md scanning. Codex review (orchestration/REVIEW_BRIEF.md) found
+one violation on first pass: claims_acs parsing was too lenient, silently
+accepting bare digit ids and malformed values instead of enforcing the
+AC-0NN grammar. Fixed (commit fb7dcbe) and re-reviewed clean. All required
+checks green (unit, validate-state, validate-task). Sensitive-area sweep
+(authentication, authorisation, RLS, money arithmetic, secrets) clean —
+expected, this is infrastructure work touching none of those areas.
+
+---
