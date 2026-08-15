@@ -1,0 +1,8 @@
+id: task-001
+branch: task-001-ci-and-validators
+attempt: 1
+claims_acs: not-a-list
+allowed_paths:
+  - scripts/
+required_checks:
+  - unit

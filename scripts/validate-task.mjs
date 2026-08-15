@@ -53,22 +53,47 @@ function parseArgs(argv) {
   return args;
 }
 
-// claims_acs may be written as the literal inline empty list (claims_acs: [])
-// or as a multi-line "- AC-0NN" block; both are valid per engineering/TESTING.md.
-// Returns undefined when the field is absent entirely.
+const AC_ID_RE = /^AC-\d{3}$/;
+
+// claims_acs must be either the literal inline empty list (claims_acs: [])
+// or a multi-line "- AC-0NN" block whose every item matches AC_ID_RE
+// exactly - DOC-017's AC id grammar. Bare digits ("001"), lowercase, or any
+// other shape are rejected outright, never silently normalized into a
+// matching id. Returns: undefined (the "claims_acs:" key is absent
+// entirely), the string 'malformed' (the key is present but neither
+// recognized shape - a non-list scalar, or a list with a badly-shaped or
+// zero items), or an array of well-formed ids.
 function extractClaimsAcs(text) {
   const inline = text.match(/^claims_acs:[ \t]*\[([^\]]*)\][ \t]*(#.*)?$/m);
   if (inline) {
     const inner = inline[1].trim();
     if (inner === '') return [];
-    return inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    const items = inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, ''));
+    return items.every((id) => AC_ID_RE.test(id)) ? items : 'malformed';
   }
-  return extractList(text, 'claims_acs');
-}
 
-function normalizeAcId(raw) {
-  const m = raw.match(/^(?:AC-)?(\d{3})$/);
-  return m ? m[1] : raw;
+  const lines = text.split(/\r?\n/);
+  const headerIdx = lines.findIndex((l) => /^claims_acs:[ \t]*(#.*)?$/.test(l));
+  if (headerIdx !== -1) {
+    const items = [];
+    for (let i = headerIdx + 1; i < lines.length; i++) {
+      const m = lines[i].match(/^[ \t]+-[ \t]+(.+)$/);
+      if (!m) break;
+      items.push(m[1].replace(/[ \t]+#.*$/, '').trim().replace(/^["']|["']$/g, ''));
+    }
+    // A bare "claims_acs:" header with no "- " items beneath it is
+    // malformed, not equivalent to the explicit literal claims_acs: [] -
+    // engineering/TESTING.md requires the literal empty-list form for
+    // "zero AC ids claimed".
+    if (items.length === 0) return 'malformed';
+    return items.every((id) => AC_ID_RE.test(id)) ? items : 'malformed';
+  }
+
+  // claims_acs: <bare scalar> - the key is present but is neither
+  // recognized shape (e.g. claims_acs: not-a-list).
+  if (/^claims_acs:[ \t]*\S/m.test(text)) return 'malformed';
+
+  return undefined;
 }
 
 // Same **AC-0NN** extraction check-coverage.mjs uses to read product/ACCEPTANCE.md.
@@ -160,16 +185,23 @@ function main() {
   // missing allowed_paths.
   const claimsAcs = extractClaimsAcs(taskText);
   if (claimsAcs === undefined) {
-    die(`${taskPath} has no claims_acs field (must be a list of AC ids or the literal empty list claims_acs: [])`);
+    die(`${taskPath} has no claims_acs field (must be a list of AC ids matching AC-0NN, or the literal empty list claims_acs: [])`);
+  }
+  if (claimsAcs === 'malformed') {
+    die(
+      `${taskPath}'s claims_acs is malformed: every item must match AC-0NN exactly ` +
+      `(e.g. AC-001, not 001 or ac-001), and an empty claim set must be written as ` +
+      `the literal claims_acs: []`
+    );
   }
   if (claimsAcs.length > 0) {
     const acceptanceText = readTextFile(args.acceptance, 'acceptance file');
     const knownAcIds = acIdsIn(acceptanceText);
-    const unknown = claimsAcs.filter((raw) => !knownAcIds.has(normalizeAcId(raw)));
+    const unknown = claimsAcs.filter((id) => !knownAcIds.has(id.slice(3)));
     if (unknown.length) {
       console.error(`INVALID: ${taskPath}`);
-      for (const raw of unknown) {
-        console.error(`  - claims_acs names an AC id that does not exist in ${args.acceptance}: ${raw}`);
+      for (const id of unknown) {
+        console.error(`  - claims_acs names an AC id that does not exist in ${args.acceptance}: ${id}`);
       }
       process.exit(1);
     }

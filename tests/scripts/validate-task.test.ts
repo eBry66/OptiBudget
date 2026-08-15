@@ -85,6 +85,19 @@ describe('scripts/validate-task.mjs', () => {
     expect(result.stderr).toContain('AC-999');
   });
 
+  it('fails when a claims_acs item is a bare digit id instead of AC-0NN', () => {
+    const result = run('bare-digit-claims-acs-task.yml');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('malformed');
+    expect(result.stderr).toContain('AC-0NN');
+  });
+
+  it('fails when claims_acs is a non-list scalar value', () => {
+    const result = run('malformed-claims-acs-task.yml');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('malformed');
+  });
+
   it('passes when allowed_paths is a subset and the diff (here, empty) stays within it', () => {
     const result = run('valid-task.yml', ['--base', 'HEAD']);
     expect(result.status).toBe(0);
